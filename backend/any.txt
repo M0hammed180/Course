@@ -1,0 +1,10 @@
+app.get("/hello", (req, res) => {
+  res.send("levlnv");
+});
+
+app.get("/sum/:num1/:num2", (req, res) => {
+  num1 = req.params.num1;
+  num2 = req.params.num2;
+  total = Number(num1) + Number(num2);
+  res.send(`total is ${total}`);
+});
