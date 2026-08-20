@@ -3,29 +3,33 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { setUserData } from "../../Redux/userSlice";
 import { Link, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   const { userName } = useSelector((state) => state.user);
-  console.log(userName);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
-    console.log(email, password);
 
     try {
-      const response = await axios.post("http://localhost:3000/login", {
+      const response = await axios.post("http://localhost:3000/user/login", {
         email: email,
         password: password,
       });
 
       console.log("Success:", response.data.message);
-      dispatch(setUserData(response.data.userData));
+      localStorage.setItem("token", response.data.token);
+
+      const decoded = jwtDecode(response.data.token);
+      console.log(decoded);
+      
+      dispatch(setUserData(decoded));
       navigate("/");
     } catch (error) {
       if (error.response) {

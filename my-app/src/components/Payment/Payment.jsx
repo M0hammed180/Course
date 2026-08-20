@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import Loading from "../Elements/Loading";
 
 export default function Payment() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export default function Payment() {
     const fetchCourseDetails = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/course/${courseId}`,
+          `http://localhost:3000/course/course/${courseId}`,
         );
         setCourse(response.data.course);
         setLoading(false);
@@ -28,11 +29,7 @@ export default function Payment() {
   }, [courseId]);
 
   if (loading) {
-    return (
-      <div className="pt-24 text-center text-2xl">
-        Loading Course Details...
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!course) {
@@ -92,7 +89,7 @@ export default function Payment() {
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900">
           <img
-            src={`http://localhost:3000/${course.photo}`}
+            src={course.photo}
             alt="course"
             className="h-56 w-full object-cover"
           />

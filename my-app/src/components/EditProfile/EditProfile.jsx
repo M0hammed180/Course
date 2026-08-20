@@ -1,16 +1,28 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserData } from "../../Redux/userSlice";
 
-export default function Register() {
+export default function EditProfile() {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  const dispatch = useDispatch();
+  const {
+    role,
+    userId,
+    isAuthenticated,
+    avatar: avatarSlice,
+    userName,
+    phone: phoneSlice,
+    email: emailSlice,
+  } = useSelector((state) => state.user);
+
+  const [name, setName] = useState(userName);
+  const [phone, setPhone] = useState(phoneSlice);
+  const [email, setEmail] = useState(emailSlice);
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("student");
   const [avatar, setAvatar] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [preview, setPreview] = useState(avatarSlice);
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
@@ -27,11 +39,11 @@ export default function Register() {
     setPreview(imageUrl);
   };
 
-  const handleRegister = async (e) => {
+  const handleEdit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("name", name);
-    formData.append("role", role);
+    formData.append("userId", userId);
     formData.append("phone", phone);
     formData.append("email", email);
     formData.append("password", password);
@@ -39,8 +51,8 @@ export default function Register() {
       formData.append("photo", avatar);
     }
     try {
-      const response = await axios.post(
-        "http://localhost:3000/user/register",
+      const response = await axios.patch(
+        "http://localhost:3000/user/edit",
         formData,
         {
           headers: {
@@ -48,11 +60,12 @@ export default function Register() {
           },
         },
       );
-      navigate("/login");
+      dispatch(setUserData(response.data.user));
+      navigate("/");
       console.log("Success:", response.data.message);
     } catch (error) {
       if (error.response) {
-        console.error("Login Failed:", error.response.data.error);
+        console.error("Edited Failed:", error.response.data.error);
       } else {
         console.error("Network Error:", error.message);
       }
@@ -66,11 +79,11 @@ export default function Register() {
         <div className="w-full flex items-center justify-center">
           <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-8 shadow-xl dark:border-slate-800 dark:bg-slate-900">
             <h1 className="mb-6 text-center text-3xl font-semibold text-slate-800 dark:text-slate-100">
-              Register
+              My Profile
             </h1>
 
             <form
-              onSubmit={handleRegister}
+              onSubmit={handleEdit}
               className="space-y-4 flex flex-col justify-center items-center w-full"
             >
               <div className="h-32 w-32 overflow-hidden rounded-full border-2 border-gray-300 bg-gray-100">
@@ -102,6 +115,7 @@ export default function Register() {
                     </label>
                     <input
                       type="text"
+                      value={name}
                       onChange={(e) => setName(e.target.value)}
                       id="username"
                       name="username"
@@ -116,6 +130,7 @@ export default function Register() {
                       Phone
                     </label>
                     <input
+                      value={phone}
                       type="text"
                       onChange={(e) => setPhone(e.target.value)}
                       id="phone"
@@ -134,6 +149,7 @@ export default function Register() {
                     </label>
                     <input
                       type="text"
+                      value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       id="email"
                       name="email"
@@ -159,36 +175,14 @@ export default function Register() {
               </div>
 
               <div className=" flex justify-around items-center w-full">
-                <select
-                  id="role"
-                  onChange={(e) => setRole(e.target.value)}
-                  name="role"
-                  className="mt-1 p-2 w-5/12 border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-                >
-                  <option value="student" className="dark:bg-slate-800">
-                    Student
-                  </option>
-                  <option value="teacher" className="dark:bg-slate-800">
-                    Teacher
-                  </option>
-                </select>
-
                 <button
                   type="submit"
-                  className="w-5/12 rounded-2xl bg-cyan-600 p-3 font-semibold text-white transition hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+                  className="w-full rounded-2xl bg-cyan-600 p-3 font-semibold text-white transition hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
                 >
-                  Sign Up
+                  Edit
                 </button>
               </div>
             </form>
-            <div className="mt-4 text-sm text-gray-600 dark:text-gray-100 text-center">
-              <p>
-                Already have an account?{" "}
-                <Link to="/login" className="hover:underline">
-                  Login here
-                </Link>
-              </p>
-            </div>
           </div>
         </div>
       </div>

@@ -11,6 +11,11 @@ const levelSchema = new mongoose.Schema(
       type: Number,
       required: false,
     },
+    type: {
+      type: String,
+      enum: ["video", "quiz"],
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -22,6 +27,13 @@ const levelSchema = new mongoose.Schema(
     },
     video: {
       type: String,
+    },
+    quizId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Quiz",
+      required: function () {
+        return this.type === "quiz";
+      },
     },
   },
   {

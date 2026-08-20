@@ -16,13 +16,14 @@ import AddLevel from "./components/Teacher/AddLevel";
 import Course from "./components/Course/Course";
 import Payment from "./components/Payment/Payment";
 import Purchased from "./components/Purchased/Purchased";
-import ScrollToTop from "./components/ScrollToTop"
+import ScrollToTop from "./components/ScrollToTop";
+import EditCourse from "./components/Teacher/EditCourse";
+import EditLevel from "./components/Teacher/EditLevel";
+import EditProfile from "./components/EditProfile/EditProfile";
 function App() {
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "light",
   );
-
- 
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -35,7 +36,7 @@ function App() {
     >
       <Provider store={reduxstore}>
         <BrowserRouter>
-        <ScrollToTop />
+          <ScrollToTop />
           <Navbar
             theme={theme}
             toggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -53,6 +54,9 @@ function App() {
               <Route path="/course/:id" element={<Course />} />
               <Route path="/payment/:courseId" element={<Payment />} />
               <Route path="/purchased/:id" element={<Purchased />} />
+              <Route path="/editcourse/:id" element={<EditCourse />} />
+              <Route path="/editlevel/:id" element={<EditLevel />} />
+              <Route path="/edit/" element={<EditProfile />} />
             </Routes>
           </div>
           <Footer theme={theme} />

@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Loading from "../Elements/Loading";
 
-export default function AddCourse() {
-  const navigate = useNavigate();
+export default function EditCourse() {
+  const { id } = useParams();
   const { userId } = useSelector((state) => state.user);
-  console.log(userId);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
@@ -24,12 +23,33 @@ export default function AddCourse() {
     }
   };
 
-  const handleAdd = async (e) => {
+  useEffect(() => {
+    const fetchCourseDetails = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/course/course/${id}`,
+        );
+        const data = response.data.course;
+        console.log(data);
+        setName(data.name);
+        setPrice(data.price);
+        setDescription(data.description);
+        setPreview(data.photo);
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourseDetails();
+  }, [id]);
+  const handleEdit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
+    formData.append("courseId", id);
     formData.append("name", name);
-    formData.append("teacherId", userId);
     formData.append("price", price);
     formData.append("description", description);
     if (photo) {
@@ -37,8 +57,8 @@ export default function AddCourse() {
     }
     setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:3000/course",
+      const response = await axios.patch(
+        "http://localhost:3000/course/edit",
         formData,
         {
           headers: {
@@ -46,8 +66,8 @@ export default function AddCourse() {
           },
         },
       );
+
       console.log("Success:", response.data.message);
-      navigate(-1);
     } catch (error) {
       if (error.response) {
         console.error(error.response.data.error);
@@ -63,15 +83,15 @@ export default function AddCourse() {
   }
   return (
     <div>
-      <div className="flex flex-wrap  min-h-1/2 bg-slate-50 px-4 py-10 dark:bg-slate-950 sm:px-6 lg:px-8">
+      <div className="flex flex-wrap min-h-1/2 bg-slate-50 px-4 py-10 dark:bg-slate-950 sm:px-6 lg:px-8">
         {/* Left Pane */}
         <div className="w-full md:w-1/2 flex items-center justify-center">
           <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-xl dark:border-slate-800 dark:bg-slate-900">
             <h1 className="mb-6 text-center text-3xl font-semibold text-slate-800 dark:text-slate-100">
-              Add Course
+              Edit Course
             </h1>
 
-            <form onSubmit={handleAdd} className="space-y-4">
+            <form onSubmit={handleEdit} className="space-y-4">
               <div className="flex justify-center items-start gap-2">
                 {/* Your form elements go here */}
                 <div className="space-y-4">
@@ -84,6 +104,7 @@ export default function AddCourse() {
                     </label>
                     <input
                       type="text"
+                      value={name}
                       onChange={(e) => setName(e.target.value)}
                       id="name"
                       name="name"
@@ -99,6 +120,7 @@ export default function AddCourse() {
                     </label>
                     <input
                       type="number"
+                      value={price}
                       onChange={(e) => setPrice(e.target.value)}
                       id="price"
                       name="price"
@@ -132,6 +154,7 @@ export default function AddCourse() {
                     </label>
                     <textarea
                       type="description"
+                      value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       id="description"
                       rows="3"
@@ -147,14 +170,14 @@ export default function AddCourse() {
                   type="submit"
                   className="w-full rounded-2xl bg-cyan-600 p-3 font-semibold text-white transition hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
                 >
-                  ADD
+                  Edit
                 </button>
               </div>
             </form>
           </div>
         </div>
-        {/* Preview */}
         <div className="w-full md:w-1/2 flex justify-center items-center">
+          {" "}
           {preview && (
             <img
               src={preview}

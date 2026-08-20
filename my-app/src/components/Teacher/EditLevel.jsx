@@ -1,24 +1,21 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
 import Loading from "../Elements/Loading";
 
-export default function AddLevel() {
+export default function EditLevel() {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const levelsLength = localStorage.getItem("levelsLength");
-  const [level, setLevel] = useState(levelsLength);
+  const [level, setLevel] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(null);
-  const [video, setVideo] = useState(null);
+  const [video, setVideo] = useState("");
   const [videoPreview, setVideoPreview] = useState("");
+  const [levelId, setLevelId] = useState("");
   const [timeLimit, setTimeLimit] = useState("");
   const [type, setType] = useState("video");
-  const [errorMessage, setErrorMessage] = useState("");
   const [questions, setQuestions] = useState([
     {
       question: "",
@@ -27,7 +24,6 @@ export default function AddLevel() {
       points: 1,
     },
   ]);
-
   const getYoutubeEmbedUrl = (url) => {
     try {
       const parsedUrl = new URL(url);
@@ -60,58 +56,66 @@ export default function AddLevel() {
     ]);
   };
 
-  const handleAdd = async (e) => {
-    e.preventDefault();
-    setErrorMessage("");
+  useEffect(() => {
+    const fetchLevel = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/level/${id}`);
+        const data = response.data.level;
+        console.log(data);
+        setQuestions(data?.quizId?.questions || []);
+        setLevel(data.level);
+        setTitle(data.title);
+        setDescription(data.description);
+        setType(data.type || "video");
+        setVideo(data?.video || "");
+        setVideoPreview(data?.video || "");
+        setTimeLimit(data?.quizId?.timeLimit || "");
+      } catch (error) {
+        if (error.response) {
+          console.error(error.response);
+        } else {
+          console.error("Network Error:", error.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLevel();
+  }, [id]);
 
-    if (
-      type === "quiz" &&
-      (!timeLimit ||
-        questions.some(
-          (question) =>
-            !question.question.trim() ||
-            question.options.some((option) => !option.trim()) ||
-            question.correctAnswer === null,
-        ))
-    ) {
-      setErrorMessage(
-        "Complete every quiz question, its four options, and the correct answer.",
-      );
-      return;
-    }
+  const handleEdit = async (e) => {
+    e.preventDefault();
 
     const data = {
-      courseId: id || "",
-      level: level || "",
-      title: title || "",
-      description: description || "",
-      type: type || "",
+      levelId: id,
+      level,
+      title,
+      description,
+      type,
+      video: type === "video" ? video : "",
+      questions: type === "quiz" ? JSON.stringify(questions) : [],
+      timeLimit: type === "quiz" ? timeLimit : "",
     };
 
-    if (type == "video" && video) {
-      data.video = video;
-    } else if (type == "quiz") {
-      data.questions = JSON.stringify(questions);
-      data.timeLimit = timeLimit || "";
-    }
-
     setLoading(true);
+
     try {
-      const response = await axios.post("http://localhost:3000/level/", data);
-      navigate(-1);
+      const response = await axios.patch(
+        "http://localhost:3000/level/edit",
+        data,
+      );
+
       console.log("Success:", response.data.message);
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.response?.data?.status ||
-        "Unable to add the level. Please try again.";
-      setErrorMessage(message);
-      console.error(error.response?.data || error);
+      if (error.response) {
+        console.error(error.response.data);
+      } else {
+        console.error("Network Error:", error.message);
+      }
     } finally {
       setLoading(false);
     }
   };
-
   if (loading) {
     return <Loading />;
   }
@@ -125,15 +129,10 @@ export default function AddLevel() {
         >
           <div className="w-full rounded-3xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-8 lg:flex-1">
             <h1 className="mb-6 text-center text-3xl font-semibold text-slate-800 dark:text-slate-100">
-              Add Level
+              Edit Level
             </h1>
 
-            <form onSubmit={handleAdd} className="w-full">
-              {errorMessage && (
-                <p className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">
-                  {errorMessage}
-                </p>
-              )}
+            <form onSubmit={handleEdit} className="w-full">
               <div
                 className={`grid gap-6 ${type == "quiz" ? "lg:grid-cols-2" : ""}`}
               >
@@ -175,6 +174,7 @@ export default function AddLevel() {
                     </label>
                     <input
                       type="text"
+                      value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       id="title"
                       name="title"
@@ -207,6 +207,7 @@ export default function AddLevel() {
                       </label>
                       <input
                         type="number"
+                        value={timeLimit}
                         onChange={(e) => setTimeLimit(e.target.value)}
                         id="timeLimit"
                         name="timeLimit"
@@ -223,6 +224,7 @@ export default function AddLevel() {
                     </label>
                     <textarea
                       type="description"
+                      value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       id="description"
                       rows="2"
@@ -240,6 +242,7 @@ export default function AddLevel() {
                       </label>
                       <input
                         id="video"
+                        value={video}
                         type="text"
                         onChange={(e) => {
                           setVideo(e.target.value);
@@ -360,7 +363,7 @@ export default function AddLevel() {
                   type="submit"
                   className="w-full rounded-2xl bg-cyan-600 p-3 font-semibold text-white transition hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 mt-4"
                 >
-                  Add Level
+                  Edit
                 </button>
               </div>
             </form>

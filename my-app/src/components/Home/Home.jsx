@@ -3,9 +3,11 @@ import heroPhoto from "./../../assets/heroimg.jpg";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import Loading from "../Elements/Loading";
 export default function Home() {
   const [course, setCourse] = useState(null);
   const [myPayments, setMyPayments] = useState(null);
+  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState(null);
   const [email, setEmail] = useState(null);
@@ -15,7 +17,7 @@ export default function Home() {
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/courses`);
+        const response = await axios.get(`http://localhost:3000/course`);
         setCourse(response.data.courses);
         setLoading(false);
       } catch (error) {
@@ -25,6 +27,19 @@ export default function Home() {
     };
 
     fetchCourseDetails();
+  }, []);
+  const fetchComments = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/comment/`);
+      console.log(response.data.comments);
+
+      setComments(response.data.comments);
+    } catch (error) {
+      console.error("Error fetching Comments:", error);
+    }
+  };
+  useEffect(() => {
+    fetchComments();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -45,11 +60,7 @@ export default function Home() {
   };
 
   if (loading) {
-    return (
-      <div className="pt-24 text-center text-2xl">
-        Loading Course Details...
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!course) {
@@ -119,7 +130,7 @@ export default function Home() {
                   className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-slate-200/70 transition hover:-translate-y-1 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none"
                 >
                   <img
-                    src={`http://localhost:3000/${c.photo}`}
+                    src={c.photo}
                     alt="course"
                     className="h-44 w-full object-cover"
                   />
@@ -164,44 +175,27 @@ export default function Home() {
             What Learners Say
           </h2>
           <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl bg-linear-to-br from-cyan-600 to-blue-600 p-8 text-white shadow-xl">
-              <p className="mb-6 text-lg leading-8">
-                "This platform completely changed the way I learn. The courses
-                are well-structured and easy to follow."
-              </p>
-              <div className="flex items-center gap-4">
-                <img
-                  src="https://randomuser.me/api/portraits/men/32.jpg"
-                  alt="student"
-                  className="h-12 w-12 rounded-full"
-                />
-                <div>
-                  <h4 className="font-semibold">Alex</h4>
-                  <span className="text-sm text-cyan-100">
-                    Frontend Developer
-                  </span>
+            {comments.map((c) => (
+              <div
+                key={c._id}
+                className="rounded-3xl bg-linear-to-br from-cyan-600 to-blue-600 p-8 text-white shadow-xl"
+              >
+                <p className="mb-6 text-lg leading-8">{c.text}</p>
+                <div className="flex items-center gap-4">
+                  <img
+                    src={c.userId.avatar}
+                    alt="student"
+                    className="h-12 w-12 rounded-full"
+                  />
+                  <div>
+                    <h4 className="font-semibold">{c.userId.name}</h4>
+                    <span className="text-sm text-slate-500 dark:text-slate-400">
+                      {c.courseId.name} Course
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="rounded-3xl bg-slate-100 p-8 text-slate-700 shadow-xl dark:bg-slate-900 dark:text-slate-200">
-              <p className="mb-6 text-lg leading-8">
-                "Amazing experience! The instructors are professional and the
-                content is very practical."
-              </p>
-              <div className="flex items-center gap-4">
-                <img
-                  src="https://randomuser.me/api/portraits/women/44.jpg"
-                  alt="student"
-                  className="h-12 w-12 rounded-full"
-                />
-                <div>
-                  <h4 className="font-semibold">Sara </h4>
-                  <span className="text-sm text-slate-500 dark:text-slate-400">
-                    UI/UX Designer
-                  </span>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

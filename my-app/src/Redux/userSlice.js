@@ -6,6 +6,7 @@ const storedUser = JSON.parse(localStorage.getItem("userData")) || {
   role: "",
   email: "",
   phone: "",
+  avatar: "",
   isAuthenticated: false,
 };
 
@@ -17,9 +18,9 @@ const UserSlice = createSlice({
       state.userId = action.payload._id;
       state.userName = action.payload.name;
       state.role = action.payload.role;
-      state.academic_year = action.payload.academic_year;
       state.email = action.payload.email;
       state.phone = action.payload.phone;
+      state.avatar = action.payload.avatar || "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_1280.png";
       state.isAuthenticated = true;
       localStorage.setItem("userData", JSON.stringify(state));
     },
@@ -27,11 +28,12 @@ const UserSlice = createSlice({
       state.userId = "";
       state.userName = "";
       state.role = "";
-      state.academic_year = "";
       state.email = "";
       state.phone = "";
+      state.avatar = "";
       state.isAuthenticated = false;
       localStorage.removeItem("userData");
+      localStorage.removeItem("token");
     },
   },
 });
