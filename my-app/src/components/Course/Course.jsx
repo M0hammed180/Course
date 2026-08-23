@@ -1,14 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import Loading from "../Elements/Loading";
 import { useSelector } from "react-redux";
-
+import YouTube from "react-youtube";
+import { FiLock, FiTrash } from "react-icons/fi";
 export default function Course() {
   const { id } = useParams();
+  const playerRef = useRef(null);
+  const intervalRef = useRef(null);
+  const hasCompletedRef = useRef(false);
+  const [remainingTime, setRemainingTime] = useState(0);
+  const [current, setCurrent] = useState(0);
   const [course, setCourse] = useState(null);
+  const [lastCompletedLevel, setLastCompletedLevel] = useState(null);
+  const [nextCourseNumber, setNextCourseNumber] = useState(1);
   const [levels, setLevels] = useState([]);
   const [comments, setComments] = useState([]);
+  const [score, setScore] = useState({});
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState("");
@@ -18,7 +27,25 @@ export default function Course() {
   const { role, userId, isAuthenticated, avatar, userName } = useSelector(
     (state) => state.user,
   );
+  //update current & remainig in change level
+  useEffect(() => {
+    hasCompletedRef.current = false;
+    setCurrent(0);
+    setRemainingTime(0);
+    setScore({});
 
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [selected?._id]);
+  //fetch
   const fetchCourseDetails = async () => {
     try {
       const response = await axios.get(
@@ -26,15 +53,10 @@ export default function Course() {
       );
       setCourse(response.data.course);
       setLevels(response.data.levels || []);
-
-      if (response.data.levels?.length > 0) {
-        setSelected(response.data.levels[0]);
-      }
     } catch (error) {
       console.error("Error fetching course details:", error);
     }
   };
-
   const fetchComments = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/comment/${id}`);
@@ -43,21 +65,38 @@ export default function Course() {
       console.error("Error fetching Comments:", error);
     }
   };
+  const fetchLastlevel = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/progress/lastlevel/${id}/${userId}`,
+      );
+      console.log(response.data);
+      setLastCompletedLevel(response.data.lastLevel);
+      setNextCourseNumber(Number(response.data.numberOfLastLevel) + 1);
+      setSelected(response.data.nextLevel);
+    } catch (error) {
+      console.error("Error fetching Last Level:", error);
+    }
+  };
 
+  //loadAllData
   useEffect(() => {
     const loadAllData = async () => {
       setLoading(true);
-      await Promise.all([fetchCourseDetails(), fetchComments()]);
+      await Promise.all([
+        fetchCourseDetails(),
+        fetchComments(),
+        fetchLastlevel(),
+      ]);
       setLoading(false);
     };
 
     loadAllData();
   }, [id]);
-
+  //comment
   const handleCancel = () => {
     setCommentText("");
   };
-
   const addComment = async (e) => {
     e?.preventDefault();
     if (!commentText.trim()) return;
@@ -74,7 +113,6 @@ export default function Course() {
       console.error("Error adding comment:", error);
     }
   };
-
   const handleDelete = async (commentId) => {
     try {
       await axios.delete(`http://localhost:3000/comment/${commentId}`);
@@ -83,12 +121,10 @@ export default function Course() {
       console.error("Error deleting comment:", error);
     }
   };
-
   const handleStartEdit = (comment) => {
     setEditingId(comment._id);
     setEditText(comment.text);
   };
-
   const handleSaveEdit = async (commentId) => {
     if (!editText.trim()) return;
     try {
@@ -107,13 +143,29 @@ export default function Course() {
       console.error("Error editing comment:", error);
     }
   };
-
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditText("");
   };
-
-  const getYoutubeEmbedUrl = (url) => {
+  // getScore
+  const fetchScore = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/quiz/score/${userId}/${selected?.quizId}`,
+      );
+      console.log(response.data);
+      setScore(response.data.score);
+    } catch (error) {
+      console.error("Error fetching Last Level:", error);
+    }
+  };
+  useEffect(() => {
+    if (selected?.type === "quiz" && userId && selected?.quizId) {
+      fetchScore();
+    }
+  }, [selected, userId]);
+  //getYoutubeVideoId
+  const getYoutubeVideoId = (url) => {
     try {
       const parsedUrl = new URL(url);
       let videoId = "";
@@ -124,18 +176,113 @@ export default function Course() {
         videoId = parsedUrl.pathname.slice(1);
       }
 
-      if (!videoId) return null;
-      return `https://www.youtube.com/embed/${videoId}`;
+      return videoId || null;
     } catch {
       return null;
     }
   };
-
+  //progress
   const progress =
-    levels.length > 0 && selected?.level
-      ? (selected.level / levels.length) * 100
+    levels.length > 0 && lastCompletedLevel?.level
+      ? (lastCompletedLevel.level / levels.length) * 100
       : 0;
+  //YouTube
+  const onStateChange = (event) => {
+    if (event.data === 1) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
 
+      intervalRef.current = setInterval(() => {
+        if (playerRef.current) {
+          const currentt = playerRef.current.getCurrentTime();
+          const total = playerRef.current.getDuration();
+          const remaining = total - currentt;
+          setCurrent(currentt);
+          setRemainingTime(remaining);
+        }
+      }, 1000);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+  };
+  const opts = {
+    height: "100%",
+    width: "100%",
+    playerVars: {
+      enablejsapi: 1,
+      origin: window.location.origin,
+    },
+  };
+  //send Complete Level
+  const completeLevel = async () => {
+    if (!selected?._id || hasCompletedRef.current || !playerRef.current) {
+      return;
+    }
+
+    const currentTime = playerRef.current.getCurrentTime();
+    const duration = playerRef.current.getDuration();
+
+    if (currentTime >= 1 && duration > 0 && duration - currentTime <= 60) {
+      hasCompletedRef.current = true;
+
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/progress/complete",
+          {
+            courseId: id,
+            levelId: selected._id,
+            userId,
+          },
+        );
+
+        console.log(response.data);
+
+        if (response.data.message !== "Level already completed") {
+          setNextCourseNumber(Number(selected.level) + 1);
+        }
+      } catch (error) {
+        hasCompletedRef.current = false;
+        console.error("Error completing level:", error);
+      }
+    }
+  };
+  useEffect(() => {
+    completeLevel();
+  }, [remainingTime, current, selected?._id, id, userId]);
+  //toNextLevelQuiz
+  const completeQuiz = async () => {
+    if (
+      selected?.type !== "quiz" ||
+      !score ||
+      score === "no score" ||
+      !score.totalScore ||
+      hasCompletedRef.current
+    ) {
+      return;
+    }
+
+    const percentage = (score.score / score.totalScore) * 100;
+
+    if (percentage >= 50) {
+      hasCompletedRef.current = true;
+
+      try {
+        await axios.post("http://localhost:3000/progress/complete", {
+          courseId: id,
+          levelId: selected._id,
+          userId,
+        });
+
+        setNextCourseNumber(Number(selected.level) + 1);
+      } catch (error) {
+        hasCompletedRef.current = false;
+        console.error("Error completing quiz:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    completeQuiz();
+  }, [score, selected, id, userId]);
   if (loading) {
     return <Loading />;
   }
@@ -159,39 +306,78 @@ export default function Course() {
         <div className="mt-1 gap-6 md:flex items-start">
           {/* Main Video & Comments Section */}
           <div className="md:w-3/4 flex flex-col gap-4">
-            <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 h-fit">
-              <div className="p-1">
-                <div className="rounded-3xl border border-slate-200 bg-slate-950 p-2 shadow-inner dark:border-slate-800">
-                  <div className="overflow-hidden rounded-[20px] bg-black">
-                    <iframe
-                      key={selected?._id}
-                      src={getYoutubeEmbedUrl(selected?.video)}
-                      allowFullScreen
-                      className="aspect-video w-full object-cover"
-                    />
-                  </div>
-                </div>
+            {selected?.type == "video" ? (
+              <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 h-fit ">
+                {" "}
+                <div className="p-1">
+                  <div className="rounded-3xl border border-slate-200 bg-slate-950 p-2 shadow-inner dark:border-slate-800">
+                    <div className="overflow-hidden rounded-[20px] bg-black">
+                      <YouTube
+                        key={selected?._id}
+                        videoId={getYoutubeVideoId(selected?.video)}
+                        onStateChange={onStateChange}
+                        opts={opts}
+                        onReady={(event) => {
+                          playerRef.current = event.target;
 
-                <div className="mt-6 rounded-2xl bg-slate-50 p-5 dark:bg-slate-800/70">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white">
-                      {selected?.title}
-                    </span>
-                    <span className="text-sm text-slate-500 dark:text-slate-400">
-                      {selected?.duration}
-                    </span>
+                          setCurrent(0);
+                          setRemainingTime(event.target.getDuration());
+                        }}
+                        className="aspect-video w-full object-cover"
+                      />
+                    </div>
                   </div>
-                  <h2 className="mt-3 text-xl font-semibold text-slate-800 dark:text-white">
-                    {selected?.description || "Select a level to start"}
-                  </h2>
-                  <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                    In this level, you will learn practical fundamentals through
-                    direct examples and real applications to help you understand
-                    the content more deeply.
-                  </p>
-                </div>
+                  <div className="mt-6 rounded-2xl bg-slate-50 p-5 dark:bg-slate-800/70">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white">
+                        {selected?.title}
+                      </span>
+                      <span className="text-sm text-slate-500 dark:text-slate-400">
+                        {selected?.duration}
+                      </span>
+                    </div>
+                    <h2 className="mt-3 text-xl font-semibold text-slate-800 dark:text-white">
+                      {selected?.description || "Select a level to start"}
+                    </h2>
+                    <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                      In this level, you will learn practical fundamentals
+                      through direct examples and real applications to help you
+                      understand the content more deeply.
+                    </p>
+                  </div>{" "}
+                </div>{" "}
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="flex justify-center items-center overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 h-[20vh] md:h-[70vh]">
+                  {score == "no score" ? (
+                    <Link
+                      to={`/quiz/${selected.quizId}`}
+                      className="rounded-4xl p-10 text-xl font-bold text-center cursor-pointer text-black bg-slate-200 dark:text-white dark:bg-slate-900 border border-slate-700"
+                    >
+                      {selected.title} Quiz
+                    </Link>
+                  ) : (
+                    <>
+                      <div className="flex flex-col justify-center items-center gap-4">
+                        <div className="rounded-4xl p-10 md:text-4xl text-xl font-bold text-center text-black bg-slate-200 dark:text-white dark:bg-slate-900 border border-slate-700">
+                          {score.score}/{score.totalScore}
+                        </div>
+
+                        {score.score < score.totalScore * (1 / 2) && (
+                          <Link
+                            to={`/quiz/${selected.quizId}`}
+                            className="rounded-4xl p-10 text-xl font-bold text-center cursor-pointer text-black bg-slate-200 dark:text-white dark:bg-slate-900 border border-slate-700"
+                          >
+                            Answer {selected.title} Quiz Again
+                          </Link>
+                        )}
+                      </div>{" "}
+                    </>
+                  )}
+                </div>
+              </>
+            )}
 
             {/* Comments Box */}
             <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 p-5 space-y-6">
@@ -339,7 +525,7 @@ export default function Course() {
                     Progress
                   </span>
                   <span className="font-medium rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-300">
-                    {selected?.level ?? 0}/{levels.length}
+                    {lastCompletedLevel?.level ?? 0}/{levels.length}
                   </span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800">
@@ -363,11 +549,12 @@ export default function Course() {
                   levels.map((level) => (
                     <button
                       key={level._id}
+                      disabled={level.level > nextCourseNumber ? true : false}
                       onClick={() => !level.locked && setSelected(level)}
-                      className={`w-full rounded-2xl border p-4 text-right transition-all duration-200 ${
+                      className={`w-full rounded-2xl border p-4 text-right transition-all  duration-200 ${
                         selected?._id === level._id
                           ? "border-indigo-500 bg-indigo-600 shadow-lg shadow-indigo-900/20"
-                          : level.locked
+                          : level.level > nextCourseNumber
                             ? "cursor-not-allowed border-slate-200 bg-slate-100/70 opacity-60 dark:border-slate-700 dark:bg-slate-800/50"
                             : "cursor-pointer border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/70 dark:hover:border-slate-600 dark:hover:bg-slate-700"
                       }`}
@@ -406,18 +593,8 @@ export default function Course() {
                         </div>
 
                         <div>
-                          {level.locked ? (
-                            <svg
-                              className="h-4 w-4 text-slate-400"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2-2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
+                          {level.level > nextCourseNumber ? (
+                            <FiLock />
                           ) : (
                             <svg
                               className={`h-4 w-4 ${

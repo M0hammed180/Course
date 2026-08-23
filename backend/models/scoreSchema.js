@@ -6,13 +6,11 @@ const scoreSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true,
     },
     quizId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Quiz",
       required: true,
-      unique: true,
     },
     score: {
       type: Number,

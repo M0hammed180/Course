@@ -51,8 +51,9 @@ export default function Purchased() {
         </div>
         <div className="flex justify-center items-center flex-wrap">
           {course.map((c) => (
-            <div
+            <Link
               key={c._id}
+              to={`/course/${c._id}`}
               className=" md:w-3/12 w-5/12 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-slate-200/70 transition hover:-translate-y-1 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none
                 flex flex-col justify-center m-2 "
             >
@@ -64,22 +65,8 @@ export default function Purchased() {
 
               <div className="p-3 flex justify-between items-center text-xs md:text-lg">
                 <p className=" font-semibold uppercase">{c.name}</p>
-                {/* <p className="mb-2 text-slate-500 dark:text-slate-400">
-                    {c.levels} Level
-                  </p> */}
-                <h4 className=" font-bold text-cyan-600">{c.price} EGP</h4>
-                {/* <p className="mb-4 text-slate-500 dark:text-slate-400">
-                    {c.description}
-                  </p> */}
               </div>
-
-              <Link
-                to={`/course/${c._id}`}
-                className="rounded-2xl bg-cyan-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-cyan-700 m-2"
-              >
-                View Course
-              </Link>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

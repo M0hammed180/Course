@@ -20,6 +20,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import EditCourse from "./components/Teacher/EditCourse";
 import EditLevel from "./components/Teacher/EditLevel";
 import EditProfile from "./components/EditProfile/EditProfile";
+import Quiz from "./components/Quiz/Quiz";
 function App() {
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "light",
@@ -57,6 +58,7 @@ function App() {
               <Route path="/editcourse/:id" element={<EditCourse />} />
               <Route path="/editlevel/:id" element={<EditLevel />} />
               <Route path="/edit/" element={<EditProfile />} />
+              <Route path="/quiz/:id" element={<Quiz />} />
             </Routes>
           </div>
           <Footer theme={theme} />

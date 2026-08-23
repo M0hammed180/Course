@@ -4,6 +4,7 @@ const payments = require("../models/paymentSchema");
 const asyncWrapper = require("../middleware/asyncWrapper");
 const Quiz = require("../models/quizSchema");
 
+
 const addCourse = asyncWrapper(async (req, res) => {
   try {
     const { name, price, description, teacherId } = req.body;
@@ -164,6 +165,8 @@ const purchasedCourses = asyncWrapper(async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+
 
 module.exports = {
   addCourse,

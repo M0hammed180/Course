@@ -7,6 +7,9 @@ const courseRoute = require("./routes/course.route");
 const levelRoute = require("./routes/level.route");
 const paymentRoute = require("./routes/payments.route");
 const commentRoute = require("./routes/comments.route");
+const progressRoute = require("./routes/progress.route");
+const quizRoute = require("./routes/quiz.route");
+
 const contact = require("./utils/contact");
 const { config } = require("dotenv");
 config();
@@ -22,6 +25,8 @@ app.use("/course", courseRoute);
 app.use("/level", levelRoute);
 app.use("/payment", paymentRoute);
 app.use("/comment", commentRoute);
+app.use("/progress", progressRoute);
+app.use("/quiz", quizRoute);
 app.use("/contact", contact);
 
 // global error handler

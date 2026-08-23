@@ -20,9 +20,9 @@ const courseSchema = new mongoose.Schema(
       required: true,
     },
     teacherId: {
-    type: mongoose.Schema.Types.ObjectId, // نوع البيانات يجب أن يكون ObjectId
-    ref: 'User',                      // يجب أن يتطابق مع اسم الموديل الأساسي
-    required: true                        // اختياري: حسب احتياجك
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User',                      
+    required: true                      
   },
     photo: {
       type: String, 
