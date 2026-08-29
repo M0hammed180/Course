@@ -10,6 +10,7 @@ export default function Course() {
   const playerRef = useRef(null);
   const intervalRef = useRef(null);
   const hasCompletedRef = useRef(false);
+  const hasStartedWatchingRef = useRef(false);
   const [remainingTime, setRemainingTime] = useState(0);
   const [current, setCurrent] = useState(0);
   const [course, setCourse] = useState(null);
@@ -30,6 +31,8 @@ export default function Course() {
   //update current & remainig in change level
   useEffect(() => {
     hasCompletedRef.current = false;
+    hasStartedWatchingRef.current = false;
+
     setCurrent(0);
     setRemainingTime(0);
     setScore({});
@@ -39,9 +42,12 @@ export default function Course() {
       intervalRef.current = null;
     }
 
+    playerRef.current = null;
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
   }, [selected?._id]);
@@ -186,68 +192,82 @@ export default function Course() {
     levels.length > 0 && lastCompletedLevel?.level
       ? (lastCompletedLevel.level / levels.length) * 100
       : 0;
-  //YouTube
-  const onStateChange = (event) => {
-    if (event.data === 1) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-
-      intervalRef.current = setInterval(() => {
-        if (playerRef.current) {
-          const currentt = playerRef.current.getCurrentTime();
-          const total = playerRef.current.getDuration();
-          const remaining = total - currentt;
-          setCurrent(currentt);
-          setRemainingTime(remaining);
-        }
-      }, 1000);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-  };
-  const opts = {
-    height: "100%",
-    width: "100%",
-    playerVars: {
-      enablejsapi: 1,
-      origin: window.location.origin,
-    },
-  };
   //send Complete Level
   const completeLevel = async () => {
-    if (!selected?._id || hasCompletedRef.current || !playerRef.current) {
+    if (
+      !selected?._id ||
+      hasCompletedRef.current ||
+      !playerRef.current ||
+      !hasStartedWatchingRef.current
+    ) {
       return;
     }
 
     const currentTime = playerRef.current.getCurrentTime();
     const duration = playerRef.current.getDuration();
 
-    if (currentTime >= 1 && duration > 0 && duration - currentTime <= 60) {
-      hasCompletedRef.current = true;
+    if (currentTime < 1 || duration <= 0 || duration - currentTime > 60) {
+      return;
+    }
 
-      try {
-        const response = await axios.post(
-          "http://localhost:3000/progress/complete",
-          {
-            courseId: id,
-            levelId: selected._id,
-            userId,
-          },
-        );
+    hasCompletedRef.current = true;
 
-        console.log(response.data);
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/progress/complete",
+        {
+          courseId: id,
+          levelId: selected._id,
+          userId,
+        },
+      );
 
-        if (response.data.message !== "Level already completed") {
-          setNextCourseNumber(Number(selected.level) + 1);
+      console.log(response.data);
+
+      if (response.data.message !== "Level already completed") {
+        setNextCourseNumber(Number(selected.level) + 1);
+      }
+    } catch (error) {
+      hasCompletedRef.current = false;
+      console.error("Error completing level:", error);
+    }
+  };
+  //YouTube
+  const onStateChange = (event) => {
+    if (event.data === 1) {
+      hasStartedWatchingRef.current = true;
+
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      intervalRef.current = setInterval(() => {
+        if (!playerRef.current || !selected?._id) return;
+
+        const currentTime = playerRef.current.getCurrentTime();
+        const duration = playerRef.current.getDuration();
+
+        setCurrent(currentTime);
+        setRemainingTime(duration - currentTime);
+
+        if (
+          hasStartedWatchingRef.current &&
+          !hasCompletedRef.current &&
+          currentTime >= 1 &&
+          duration > 0 &&
+          duration - currentTime <= 60
+        ) {
+          completeLevel();
         }
-      } catch (error) {
-        hasCompletedRef.current = false;
-        console.error("Error completing level:", error);
+      }, 1000);
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     }
   };
-  useEffect(() => {
-    completeLevel();
-  }, [remainingTime, current, selected?._id, id, userId]);
+
   //toNextLevelQuiz
   const completeQuiz = async () => {
     if (
@@ -279,10 +299,10 @@ export default function Course() {
       }
     }
   };
-
   useEffect(() => {
     completeQuiz();
   }, [score, selected, id, userId]);
+
   if (loading) {
     return <Loading />;
   }
@@ -316,9 +336,21 @@ export default function Course() {
                         key={selected?._id}
                         videoId={getYoutubeVideoId(selected?.video)}
                         onStateChange={onStateChange}
-                        opts={opts}
+                        opts={{
+                          height: "100%",
+                          width: "100%",
+                          playerVars: {
+                            enablejsapi: 1,
+                            origin: window.location.origin,
+                          },
+                        }}
                         onReady={(event) => {
                           playerRef.current = event.target;
+
+                          event.target.seekTo(0, true);
+
+                          hasCompletedRef.current = false;
+                          hasStartedWatchingRef.current = false;
 
                           setCurrent(0);
                           setRemainingTime(event.target.getDuration());

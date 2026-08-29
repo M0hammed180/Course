@@ -28,19 +28,15 @@ export default function Login() {
 
       const decoded = jwtDecode(response.data.token);
       console.log(decoded);
-      
+
       dispatch(setUserData(decoded));
       navigate("/");
     } catch (error) {
-      if (error.response) {
-        console.error("Login Failed:", error.response.data.error);
-        setErrorMessage(error.response.data.error);
-      } else {
-        console.error("Network Error:", error.message);
-        setErrorMessage("Network Error: " + error.message);
-      }
+      console.error("Login Failed:", error);
+      setErrorMessage(error.response.data.error);
     }
   };
+  
   return (
     <div>
       <div className="flex min-h-screen  px-4 py-10 bg-slate-50 dark:bg-slate-950 sm:px-6 lg:px-8">

@@ -37,7 +37,7 @@ const calcScore = asyncWrapper(async (req, res) => {
     {
       $set: {
         score,
-        totalScore,
+        totalScore,userId
       },
     },
     {
@@ -48,6 +48,7 @@ const calcScore = asyncWrapper(async (req, res) => {
   res.status(200).json({
     success: true,
     createdScore,
+    answers,
   });
 });
 

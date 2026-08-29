@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Loading from "../Elements/Loading";
@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 export default function Quiz() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [timeLeft, setTimeLeft] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [quiz, setQuiz] = useState(null);
   const [n, setN] = useState(0);
@@ -42,10 +43,10 @@ export default function Quiz() {
 
   const currentQuestion = questions[n] || null;
 
-  const handleSelectOption = (optionIndex) => {
+  const handleSelectOption = (optionIndex, id) => {
     setSelectedAnswers((prev) => {
       const updated = [...prev];
-      updated[n] = optionIndex;
+      updated[n] = { id, optionIndex: optionIndex };
       return updated;
     });
   };
@@ -68,6 +69,26 @@ export default function Quiz() {
     }
   };
 
+  useEffect(() => {
+    if (!quiz?.timeLimit) return;
+
+    setTimeLeft(quiz.timeLimit * 60);
+
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          handleSubmitQuiz();
+          return 0;
+        }
+
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [quiz]);
+
   if (loading) {
     return <Loading />;
   }
@@ -87,7 +108,9 @@ export default function Quiz() {
           Question {n + 1} of {questions.length}
         </div>
         <div className="self-start sm:self-auto rounded-full border border-slate-300 bg-slate-200 px-4 py-1.5 text-sm font-bold text-black sm:px-5 sm:py-2 sm:text-lg dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-          Time Limit: {quiz.timeLimit ? `${quiz.timeLimit} mins` : "Unlimited"}
+          {quiz.timeLimit
+            ? `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}`
+            : "Unlimited"}
         </div>
       </div>
 
@@ -102,12 +125,12 @@ export default function Quiz() {
 
           <div className="mt-6 flex flex-col gap-3 sm:gap-4">
             {currentQuestion.options?.map((option, index) => {
-              const isSelected = selectedAnswers[n] === index;
+              const isSelected = selectedAnswers[n]?.optionIndex === index;
 
               return (
                 <button
                   key={index}
-                  onClick={() => handleSelectOption(index)}
+                  onClick={() => handleSelectOption(index, currentQuestion._id)}
                   className={`w-full text-left rounded-xl sm:rounded-2xl border px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-lg font-medium transition-all duration-200 cursor-pointer ${
                     isSelected
                       ? "border-blue-600 bg-blue-600 text-white shadow-md"

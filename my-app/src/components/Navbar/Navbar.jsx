@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../../Redux/userSlice";
+import { FiSidebar } from "react-icons/fi";
 
 export default function Navbar({ theme, toggleTheme }) {
   const dispatch = useDispatch();
@@ -29,9 +30,9 @@ export default function Navbar({ theme, toggleTheme }) {
           <div className="w-full not-md:py-2 not-md:flex justify-between items-center transform transition-all duration-300 ">
             <button
               onClick={() => setSideBar(!sideBar)}
-              className="text-xl font-semibold tracking-tight text-cyan-500 cursor-pointer "
+              className="text-xl font-semibold tracking-tight text-cyan-500 cursor-pointer flex items-center gap-1"
             >
-              Online
+              <FiSidebar size={18} /> Online
             </button>{" "}
             <button
               onClick={() => setMenu(!menu)}
@@ -80,7 +81,10 @@ export default function Navbar({ theme, toggleTheme }) {
       >
         <div className="mb-2 p-4"></div>
         <nav className="flex flex-col gap-1 min-w-60 p-2 font-sans text-base font-normal dark:text-white text-gray-700">
-          <Link to='/edit' className="flex justify-start items-center px-3 py-2 gap-3">
+          <Link
+            to="/edit"
+            className="flex justify-start items-center px-3 py-2 gap-3"
+          >
             <img
               alt="user 5"
               src={avatar}
