@@ -13,6 +13,10 @@ const progressSchema = new mongoose.Schema({
     required: true,
   },
 
+  courseComplete: Boolean,
+
+  courseLevels: Number,
+
   completedLevels: [
     {
       type: mongoose.Schema.Types.ObjectId,

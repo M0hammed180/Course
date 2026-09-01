@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { upload } = require("../middleware/upload");
 const courseController = require("../controllers/courses.controller");
+const verifyToken = require("../middleware/verfiyToken");
 
+router.use(verifyToken);
 router.post("/", upload.single("photo"), courseController.addCourse);
 
 router.patch("/edit", upload.single("photo"), courseController.editCourse);

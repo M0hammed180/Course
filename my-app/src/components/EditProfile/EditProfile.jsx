@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../../Redux/userSlice";
@@ -51,8 +51,8 @@ export default function EditProfile() {
       formData.append("photo", avatar);
     }
     try {
-      const response = await axios.patch(
-        "http://localhost:3000/user/edit",
+      const response = await api.patch(
+        "/user/edit",
         formData,
         {
           headers: {

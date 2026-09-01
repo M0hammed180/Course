@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import { useSelector } from "react-redux";
 import Loading from "../Elements/Loading";
 
@@ -14,8 +14,8 @@ export default function Payment() {
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/course/course/${courseId}`,
+        const response = await api.get(
+          `/course/course/${courseId}`,
         );
         setCourse(response.data.course);
         setLoading(false);
@@ -42,8 +42,8 @@ export default function Payment() {
 
   const handlePayment = async () => {
     try {
-      const response = await axios.post(
-        `http://localhost:3000/payment/${courseId}/${userId}`,
+      const response = await api.post(
+        `/payment/${courseId}/${userId}`,
       );
       console.log("Success:", response.data.message);
       navigate(`/course/${courseId}`);

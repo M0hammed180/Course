@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import Loading from "../Elements/Loading";
 import { useSelector } from "react-redux";
 
@@ -18,10 +18,8 @@ export default function Quiz() {
 
   const fetchQuiz = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/quiz/quiz/${id}`);
+      const response = await api.get(`/quiz/quiz/${id}`);
       const quizData = response.data.quiz;
-      console.log(quizData);
-
       setQuiz(quizData);
       setQuestions(quizData?.questions || []);
     } catch (error) {
@@ -57,13 +55,10 @@ export default function Quiz() {
         userId,
         quizId: id,
         answers: selectedAnswers,
+        timeFinished: timeLeft,
       };
-      const response = await axios.post(
-        `http://localhost:3000/quiz/submit`,
-        payload,
-      );
+      await api.post(`/quiz/submit`, payload);
       navigate(-1);
-      console.log(response.data);
     } catch (error) {
       console.error("Error submitting quiz:", error);
     }
@@ -95,19 +90,19 @@ export default function Quiz() {
 
   if (!quiz || questions.length === 0) {
     return (
-      <div className="flex min-h-[80vh] items-center justify-center p-4 text-center text-lg font-bold sm:text-xl dark:text-white">
+      <div className="flex min-h-[80vh] items-center justify-center p-4 text-center text-lg font-bold text-[#1F150C] dark:text-[#E1DCC9]">
         No quiz data available.
       </div>
     );
   }
 
   return (
-    <div className="relative flex min-h-[90vh] w-full flex-col justify-between overflow-y-auto p-4 sm:p-6 text-slate-800 dark:text-slate-100">
-      <div className="flex  gap-2 sm:items-center sm:justify-between px-2 sm:px-10">
-        <div className="self-start rounded-full border border-slate-300 bg-slate-200 px-4 py-1.5 text-sm font-bold text-black sm:px-5 sm:py-2 sm:text-lg dark:border-slate-700 dark:bg-slate-900 dark:text-white">
+    <div className="relative flex min-h-[90vh] w-full flex-col justify-between overflow-y-auto bg-[#E1DCC9] p-4 text-[#1F150C] dark:bg-[#1F150C] dark:text-[#E1DCC9] sm:p-6">
+      <div className="flex gap-2 px-2 sm:items-center sm:justify-between sm:px-10">
+        <div className="self-start rounded-full border border-[#412D15]/15 bg-[#F8F3EC] px-4 py-1.5 text-sm font-bold text-[#1F150C] shadow-[0_8px_16px_rgba(31,21,12,0.04)] dark:border-[#E1DCC9]/10 dark:bg-[#20170E] dark:text-[#E1DCC9] sm:px-5 sm:py-2 sm:text-lg">
           Question {n + 1} of {questions.length}
         </div>
-        <div className="self-start sm:self-auto rounded-full border border-slate-300 bg-slate-200 px-4 py-1.5 text-sm font-bold text-black sm:px-5 sm:py-2 sm:text-lg dark:border-slate-700 dark:bg-slate-900 dark:text-white">
+        <div className="self-start rounded-full border border-[#412D15]/15 bg-[#F8F3EC] px-4 py-1.5 text-sm font-bold text-[#1F150C] shadow-[0_8px_16px_rgba(31,21,12,0.04)] dark:border-[#E1DCC9]/10 dark:bg-[#20170E] dark:text-[#E1DCC9] sm:self-auto sm:px-5 sm:py-2 sm:text-lg">
           {quiz.timeLimit
             ? `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}`
             : "Unlimited"}
@@ -115,8 +110,8 @@ export default function Quiz() {
       </div>
 
       {currentQuestion && (
-        <div className="flex-1 my-6 px-2 sm:px-16">
-          <h2 className="text-lg font-semibold sm:text-2xl md:text-3xl leading-relaxed">
+        <div className="my-6 flex-1 px-2 sm:px-16">
+          <h2 className="text-lg font-semibold leading-relaxed text-[#1F150C] dark:text-[#E1DCC9] sm:text-2xl md:text-3xl">
             {n + 1}.{" "}
             {currentQuestion.questionText ||
               currentQuestion.title ||
@@ -131,13 +126,13 @@ export default function Quiz() {
                 <button
                   key={index}
                   onClick={() => handleSelectOption(index, currentQuestion._id)}
-                  className={`w-full text-left rounded-xl sm:rounded-2xl border px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-lg font-medium transition-all duration-200 cursor-pointer ${
+                  className={`w-full cursor-pointer rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all duration-200 sm:rounded-2xl sm:px-6 sm:py-4 sm:text-lg ${
                     isSelected
-                      ? "border-blue-600 bg-blue-600 text-white shadow-md"
-                      : "border-slate-300 bg-slate-100 hover:bg-slate-200 text-black dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800"
+                      ? "border-[#597053] bg-[#597053] text-[#F8F3EC] shadow-[0_10px_20px_rgba(89,112,83,0.18)]"
+                      : "border-[#412D15]/15 bg-[#F8F3EC] text-[#1F150C] hover:bg-[#E6DFC8] dark:border-[#E1DCC9]/10 dark:bg-[#20170E] dark:text-[#E1DCC9] dark:hover:bg-[#2A1D10]"
                   }`}
                 >
-                  <span className="mr-2 sm:mr-3 inline-block font-bold">
+                  <span className="mr-2 inline-block font-bold sm:mr-3">
                     {index + 1}.
                   </span>{" "}
                   {option}
@@ -148,11 +143,11 @@ export default function Quiz() {
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-3 px-2 sm:px-10 pt-4 border-t border-slate-200 dark:border-slate-800 sm:border-0">
+      <div className="flex items-center justify-between gap-3 border-t border-[#412D15]/15 px-2 pt-4 dark:border-[#E1DCC9]/10 sm:border-0 sm:px-10">
         <button
           onClick={() => setN((prev) => Math.max(prev - 1, 0))}
           disabled={n === 0}
-          className="rounded-full border border-slate-300 bg-slate-200 px-5 py-2 text-sm sm:px-6 sm:text-lg font-bold text-black disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-white cursor-pointer"
+          className="cursor-pointer rounded-full border border-[#412D15]/15 bg-[#F8F3EC] px-5 py-2 text-sm font-bold text-[#1F150C] disabled:cursor-not-allowed disabled:opacity-40 dark:border-[#E1DCC9]/10 dark:bg-[#20170E] dark:text-[#E1DCC9] sm:px-6 sm:text-lg"
         >
           Previous
         </button>
@@ -160,7 +155,7 @@ export default function Quiz() {
         {n === questions.length - 1 ? (
           <button
             onClick={handleSubmitQuiz}
-            className="rounded-full bg-emerald-600 px-6 py-2 text-sm sm:px-8 sm:text-lg font-bold text-white hover:bg-emerald-700 shadow-md transition-all cursor-pointer"
+            className="cursor-pointer rounded-full bg-[#412D15] px-6 py-2 text-sm font-bold text-[#E1DCC9] shadow-[0_10px_20px_rgba(31,21,12,0.12)] transition-all hover:bg-[#2D1F12] dark:bg-[#E1DCC9] dark:text-[#1F150C] dark:hover:bg-[#F8F3EC] sm:px-8 sm:text-lg"
           >
             Submit Quiz
           </button>
@@ -170,7 +165,7 @@ export default function Quiz() {
               setN((prev) => Math.min(prev + 1, questions.length - 1))
             }
             disabled={n === questions.length - 1}
-            className="rounded-full border border-slate-300 bg-slate-200 px-5 py-2 text-sm sm:px-6 sm:text-lg font-bold text-black disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-white cursor-pointer"
+            className="cursor-pointer rounded-full border border-[#412D15]/15 bg-[#F8F3EC] px-5 py-2 text-sm font-bold text-[#1F150C] disabled:cursor-not-allowed disabled:opacity-40 dark:border-[#E1DCC9]/10 dark:bg-[#20170E] dark:text-[#E1DCC9] sm:px-6 sm:text-lg"
           >
             Next
           </button>

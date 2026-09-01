@@ -43,7 +43,8 @@ const viewComments = asyncWrapper(async (req, res) => {
 const viewAllComments = asyncWrapper(async (req, res) => {
   const comments = await Comment.find()
     .populate("userId", "name avatar")
-    .populate("courseId", "name").limit(2);
+    .populate("courseId", "name")
+    .limit(2);
   res.status(201).json({
     success: true,
     comments,

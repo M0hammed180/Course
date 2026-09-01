@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import Loading from "../Elements/Loading";
 import {
   FiSearch,
@@ -28,9 +28,7 @@ export default function Levels() {
 
   const fetchCourseDetails = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/course/course/${id}`,
-      );
+      const response = await api.get(`/course/course/${id}`);
       console.log(response.data.course);
       setCourse(response.data.course);
       localStorage.setItem("levelsLength", response.data.course.levels + 1);
@@ -49,9 +47,7 @@ export default function Levels() {
   const deleteLevel = async (levelId) => {
     setLoading(true);
     try {
-      const response = await axios.delete(
-        `http://localhost:3000/level/${levelId}`,
-      );
+      const response = await api.delete(`/level/${levelId}`);
       console.log({
         success: response.data.success,
         message: response.data.message,
@@ -70,51 +66,55 @@ export default function Levels() {
 
   if (!course) {
     return (
-      <div className="text-center mt-20 text-2xl text-red-500">
+      <div className="mt-20 text-center text-2xl text-red-500 dark:text-red-400">
         Course not found!
       </div>
     );
   }
-  return (
-    <>
-      <div className=" w-full  bg-slate-50 dark:bg-slate-950 p-4 gap-4 ">
-        <h2 className="text-3xl font-bold">Levels</h2>
 
-        <div className="w-full flex flex-wrap justify-start items-center gap-4 overflow-y-auto p-5">
+  return (
+    <div className="min-h-screen w-full bg-[#E1DCC9] p-4 text-[#1F150C] dark:bg-[#1F150C] dark:text-[#E1DCC9] sm:p-6">
+      <div className="mx-auto max-w-6xl">
+        <h2 className="mb-5 text-3xl font-black text-[#1F150C] dark:text-[#E1DCC9]">
+          Levels
+        </h2>
+
+        <div className="flex flex-wrap items-center justify-start gap-4 overflow-y-auto p-2 sm:p-5">
           {levels
             .sort((a, b) => a.level - b.level)
             .map((level) => (
               <div
                 key={level._id}
-                className="bg-slate-50 dark:bg-slate-950 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors "
+                className="flex items-center justify-center gap-2 rounded-[1.25rem] border border-[#412D15]/15 bg-[#F8F3EC] p-4 shadow-[0_12px_25px_rgba(31,21,12,0.06)] dark:border-[#E1DCC9]/10 dark:bg-[#20170E]"
               >
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-100">
+                <h3 className="text-base font-bold text-[#1F150C] dark:text-[#E1DCC9] sm:text-lg">
                   {level.level}- {level.title}
                 </h3>
                 <Link
                   to={`/editlevel/${level._id}`}
-                  className=" text-blue-500 rounded-full p-2 bg-blue-300 mr-1 ml-3"
+                  className="rounded-full bg-[#E1DCC9] p-2 text-[#412D15] transition hover:bg-[#F5F0E8] dark:bg-[#412D15] dark:text-[#E1DCC9] dark:hover:bg-[#2A1D10]"
                 >
-                  <FiEdit size={20} />
+                  <FiEdit size={18} />
                 </Link>
                 <button
                   onClick={() => deleteLevel(level._id)}
-                  className=" cursor-pointer text-red-500 rounded-full p-2 bg-red-300 "
+                  className="cursor-pointer rounded-full bg-[#F1D9D9] p-2 text-[#8F3E3E] transition hover:bg-[#E9C4C4] dark:bg-[#4A1E1E] dark:text-[#F9C7C7] dark:hover:bg-[#5B2424]"
                 >
-                  <FiTrash size={20} />
+                  <FiTrash size={18} />
                 </button>
               </div>
             ))}
-          <div className="bg-slate-50 dark:bg-slate-950 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer min-h-25">
+
+          <div className="flex min-h-[88px] items-center justify-center rounded-[1.25rem] border border-dashed border-[#412D15]/30 bg-[#F8F3EC] p-4 shadow-[0_12px_25px_rgba(31,21,12,0.05)] dark:border-[#E1DCC9]/20 dark:bg-[#20170E]">
             <Link
               to={`/addlevel/${id}`}
-              className="text-lg font-bold px-10 text-gray-700 dark:text-gray-100 flex gap-1 items-center"
+              className="flex items-center justify-center p-3 text-[#412D15] transition hover:text-[#1F150C] dark:text-[#E1DCC9] dark:hover:text-[#F8F3EC]"
             >
-              <FiPlus size={50} />
+              <FiPlus size={40} />
             </Link>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

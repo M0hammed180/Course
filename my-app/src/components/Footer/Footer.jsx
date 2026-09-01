@@ -1,7 +1,7 @@
 export default function Footer({ theme }) {
   return (
     <footer
-      className={`border-t px-6 py-12 sm:px-8 lg:px-10 ${theme === "dark" ? "border-slate-800 bg-slate-900 text-slate-300" : "border-slate-200 bg-slate-950 text-slate-300"}`}
+      className={`border-t px-6 py-12 sm:px-8 lg:px-10 ${theme === "dark" ? "border-[#E1DCC9]/10 bg-[#1F150C] text-[#E1DCC9]" : "border-[#412D15]/15 bg-[#1F150C] text-[#E1DCC9]"}`}
     >
       <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-4">
         <div>

@@ -4,14 +4,32 @@
 
 :root {
   color-scheme: light;
+  --bg: #e1dcc9;
+  --bg-soft: #f5f1e8;
+  --panel: #f8f3ec;
+  --panel-strong: #412d15;
+  --panel-deep: #1f150c;
+  --text: #000000;
+  --muted: #412d15;
+  --line: rgba(65, 45, 21, 0.18);
+  --highlight: #412d15;
+  --highlight-soft: #e1dcc9;
+  --shadow: 0 18px 40px rgba(31, 21, 12, 0.12);
 }
 
 html.dark {
   color-scheme: dark;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
+  min-width: 320px;
+  background: var(--bg);
+  color: var(--text);
   font-family:
     Inter,
     ui-sans-serif,
@@ -26,10 +44,251 @@ body {
   box-sizing: border-box;
 }
 
+#root {
+  min-height: 100vh;
+}
+
 .hero {
   background-image:
-    linear-gradient(120deg, rgba(2, 132, 199, 0.9), rgba(79, 70, 229, 0.85)),
+    linear-gradient(135deg, rgba(31, 21, 12, 0.82), rgba(65, 45, 21, 0.72)),
     url("./assets/bg.jpg");
   background-size: cover;
   background-position: center;
+}
+
+.teacher-surface {
+  background: linear-gradient(180deg, #f6f1e8 0%, #e9e1d4 100%);
+}
+
+html.dark,
+html.dark body {
+  background: #000000 !important;
+  color: #e1dcc9 !important;
+}
+
+/* AMOLED dark theme: reserve black for page backgrounds and use brown surfaces. */
+html.dark .teacher-surface {
+  background: #000000 !important;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-slate-100,
+html.dark .bg-slate-200,
+html.dark .bg-slate-900,
+html.dark .bg-white,
+html.dark .dark\:bg-slate-900 {
+  background-color: #1f150c !important;
+}
+
+html.dark .bg-slate-950,
+html.dark .dark\:bg-slate-950,
+html.dark [class*="dark:bg-black"] {
+  background-color: #000000 !important;
+}
+
+html.dark .text-slate-100,
+html.dark .text-slate-200,
+html.dark .text-slate-300,
+html.dark .text-slate-400,
+html.dark .text-slate-500,
+html.dark .text-slate-600,
+html.dark .text-slate-700,
+html.dark .text-slate-800,
+html.dark .text-slate-900,
+html.dark .dark\:text-slate-100,
+html.dark .dark\:text-slate-200,
+html.dark .dark\:text-slate-300,
+html.dark .dark\:text-slate-400,
+html.dark .dark\:text-slate-500,
+html.dark .text-\[#000000\],
+html.dark .text-\[#1F150C\],
+html.dark .text-black {
+  color: #e1dcc9 !important;
+}
+
+html.dark .border-slate-200,
+html.dark .border-slate-700,
+html.dark .border-slate-800,
+html.dark .dark\:border-slate-800,
+html.dark .dark\:border-slate-700 {
+  border-color: rgba(225, 220, 201, 0.15) !important;
+}
+
+html.dark .bg-slate-800,
+html.dark .bg-slate-700,
+html.dark .dark\:bg-slate-800,
+html.dark .dark\:bg-slate-700 {
+  background-color: #412d15 !important;
+}
+
+html.dark .bg-cyan-500\/10,
+html.dark .bg-cyan-700\/50,
+html.dark .bg-indigo-100,
+html.dark .bg-indigo-500\/10,
+html.dark .bg-emerald-100,
+html.dark .bg-emerald-500\/10,
+html.dark .bg-slate-100,
+html.dark .bg-slate-200,
+html.dark .bg-slate-300 {
+  background-color: #1f150c !important;
+}
+
+html.dark .text-cyan-500,
+html.dark .text-indigo-600,
+html.dark .text-indigo-400,
+html.dark .text-emerald-600,
+html.dark .text-emerald-400,
+html.dark .text-sky-500,
+html.dark .text-blue-500 {
+  color: #e1dcc9 !important;
+}
+
+/* Replace the remaining coloured controls with the same brown treatment. */
+html.dark [class*="bg-cyan-"],
+html.dark [class*="bg-sky-"],
+html.dark [class*="bg-blue-"],
+html.dark [class*="bg-indigo-"],
+html.dark [class*="bg-violet-"],
+html.dark [class*="bg-emerald-"],
+html.dark [class*="bg-green-"],
+html.dark [class*="bg-red-"],
+html.dark [class*="bg-rose-"] {
+  background-color: #1f150c !important;
+}
+
+html.dark [class*="hover:bg-cyan-"],
+html.dark [class*="hover:bg-sky-"],
+html.dark [class*="hover:bg-blue-"],
+html.dark [class*="hover:bg-indigo-"],
+html.dark [class*="hover:bg-violet-"],
+html.dark [class*="hover:bg-emerald-"],
+html.dark [class*="hover:bg-green-"],
+html.dark [class*="hover:bg-red-"],
+html.dark [class*="hover:bg-rose-"] {
+  --tw-bg-opacity: 1;
+}
+
+html.dark [class*="from-indigo-"],
+html.dark [class*="from-violet-"],
+html.dark [class*="to-indigo-"],
+html.dark [class*="to-violet-"] {
+  --tw-gradient-from: #412d15 !important;
+  --tw-gradient-to: #1f150c !important;
+}
+
+html.dark [class*="border-cyan-"],
+html.dark [class*="border-sky-"],
+html.dark [class*="border-blue-"],
+html.dark [class*="border-indigo-"],
+html.dark [class*="border-violet-"],
+html.dark [class*="border-emerald-"],
+html.dark [class*="border-green-"],
+html.dark [class*="border-red-"],
+html.dark [class*="border-rose-"] {
+  border-color: #412d15 !important;
+}
+
+/* Keep the brown system consistent in both themes: no blue/cyan accents. */
+[class*="bg-cyan-"],
+[class*="bg-sky-"],
+[class*="bg-blue-"],
+[class*="bg-indigo-"],
+[class*="bg-violet-"],
+[class*="bg-emerald-"],
+[class*="bg-green-"],
+[class*="bg-red-"],
+[class*="bg-rose-"] {
+  background-color: #412d15 !important;
+}
+
+[class*="text-cyan-"],
+[class*="text-sky-"],
+[class*="text-blue-"],
+[class*="text-indigo-"],
+[class*="text-violet-"],
+[class*="text-emerald-"],
+[class*="text-green-"],
+[class*="text-red-"],
+[class*="text-rose-"] {
+  color: #412d15 !important;
+}
+
+[class*="border-cyan-"],
+[class*="border-sky-"],
+[class*="border-blue-"],
+[class*="border-indigo-"],
+[class*="border-violet-"],
+[class*="border-emerald-"],
+[class*="border-green-"],
+[class*="border-red-"],
+[class*="border-rose-"] {
+  border-color: #412d15 !important;
+}
+
+[class*="from-cyan-"],
+[class*="from-sky-"],
+[class*="from-blue-"],
+[class*="from-indigo-"],
+[class*="from-violet-"],
+[class*="from-emerald-"],
+[class*="to-cyan-"],
+[class*="to-sky-"],
+[class*="to-blue-"],
+[class*="to-indigo-"],
+[class*="to-violet-"],
+[class*="to-emerald-"] {
+  --tw-gradient-from: #412d15 !important;
+  --tw-gradient-to: #1f150c !important;
+}
+
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6,
+html.dark [class*="text-cyan-"],
+html.dark [class*="text-sky-"],
+html.dark [class*="text-blue-"],
+html.dark [class*="text-indigo-"],
+html.dark [class*="text-violet-"],
+html.dark [class*="text-emerald-"],
+html.dark [class*="text-green-"],
+html.dark [class*="text-red-"],
+html.dark [class*="text-rose-"] {
+  color: #e1dcc9 !important;
+}
+
+/* Pages remain pure black; cards, fields and controls stay visibly above them. */
+html.dark .min-h-screen[class*="dark:bg-[#1F150C]"],
+html.dark .min-h-screen[class*="dark:bg-[#1f150c]"] {
+  background-color: #000000 !important;
+}
+
+html.dark .bg-\[#000000\],
+html.dark .bg-\[#1F150C\],
+html.dark .bg-black {
+  background-color: #1f150c !important;
+}
+
+html.dark [class*="dark:bg-[#20170E]"],
+html.dark [class*="dark:bg-[#20170e]"],
+html.dark [class*="dark:bg-[#2A1D10]"],
+html.dark [class*="dark:bg-[#2a1d10]"],
+html.dark [class*="dark:bg-[#362713]"],
+html.dark [class*="dark:bg-[#3B2B1A]"],
+html.dark [class*="dark:bg-[#4A1E1E]"] {
+  background-color: #1f150c !important;
+}
+
+html.dark [class*="bg-cyan-"],
+html.dark [class*="bg-sky-"],
+html.dark [class*="bg-blue-"],
+html.dark [class*="bg-indigo-"],
+html.dark [class*="bg-violet-"],
+html.dark [class*="bg-emerald-"],
+html.dark [class*="bg-green-"],
+html.dark [class*="bg-red-"],
+html.dark [class*="bg-rose-"] {
+  background-color: #412d15 !important;
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import { useSelector } from "react-redux";
 import Loading from "../Elements/Loading";
 
@@ -13,7 +13,7 @@ export default function Courses() {
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/course`);
+        const response = await api.get(`/course`);
         setCourse(response.data.courses);
         setLoading(false);
       } catch (error) {
@@ -28,7 +28,7 @@ export default function Courses() {
   useEffect(() => {
     const fetchMyPayments = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/payment/${id}`);
+        const response = await api.get(`/payment/${id}`);
         setMyPayments(response.data.myPayments);
         console.log(response.data.myPayments);
       } catch (error) {

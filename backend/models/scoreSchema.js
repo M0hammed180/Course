@@ -20,6 +20,18 @@ const scoreSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    timeFinished: {
+      type: String,
+    },
+    incorrectQuestions: [
+      {
+        questionId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        wrongAnswer: Number,
+        correctAnswer: Number,
+      },
+    ],
   },
   {
     timestamps: true,

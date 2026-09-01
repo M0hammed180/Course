@@ -2,130 +2,228 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../../Redux/userSlice";
-import { FiSidebar } from "react-icons/fi";
+import { FiMoon, FiSun } from "react-icons/fi";
 
 export default function Navbar({ theme, toggleTheme }) {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+
   const logOut = () => {
     dispatch(logout());
     navigate("/login");
   };
-  const { role, userId, isAuthenticated, avatar, userName } = useSelector(
+
+  const { role, isAuthenticated, avatar, userName } = useSelector(
     (state) => state.user,
   );
+
   const [menu, setMenu] = useState(false);
   const [sideBar, setSideBar] = useState(false);
 
   const navLinkClass =
-    "rounded-full px-3 py-2 text-s not-md:text-center font-medium transition hover:bg-cyan-500/10 hover:text-cyan-500 not-md:bg-cyan-500/10 not-md:text-cyan-500";
+    "rounded-full px-3 py-2 text-sm font-medium transition-colors hover:bg-[#412D15]/10 hover:text-[#412D15] dark:hover:bg-[#E1DCC9]/10 dark:hover:text-[#E1DCC9]";
+
+  const isActive = (path) => location.pathname === path;
 
   return (
     <>
       <header
-        className={`sticky top-0 z-50 border-b : backdrop-blur ${theme === "dark" ? "border-slate-800 bg-slate-900/80 text-slate-100" : "border-slate-200 bg-white/80 text-slate-700"}`}
+        className={`sticky top-0 z-40 border-b backdrop-blur ${theme === "dark" ? "border-[#E1DCC9]/10 bg-[#1F150C]/90 text-[#E1DCC9]" : "border-[#412D15]/15 bg-[#F8F3EC]/90 text-[#1F150C]"}`}
       >
-        <div className="mx-auto flex md:flex-row flex-col md:h-16 md:max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="w-full not-md:py-2 not-md:flex justify-between items-center transform transition-all duration-300 ">
-            <button
-              onClick={() => setSideBar(!sideBar)}
-              className="text-xl font-semibold tracking-tight text-cyan-500 cursor-pointer flex items-center gap-1"
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+          <Link
+            to="/"
+            className={`flex cursor-pointer items-center gap-2 text-lg font-semibold tracking-tight ${theme === "dark" ? "text-[#E1DCC9]" : "text-[#412D15]"}`}
+          >
+            <span>Online</span>
+          </Link>
+
+          <nav className="hidden items-center justify-center gap-2 md:flex">
+            <Link
+              className={`${navLinkClass}${isActive("/") ? " bg-[#412D15] text-[#E1DCC9] dark:bg-[#E1DCC9] dark:text-[#1F150C]" : ""}`}
+              to="/"
             >
-              <FiSidebar size={18} /> Online
-            </button>{" "}
+              {role == "student" ? "Home" : "Dashboard"}
+            </Link>
+
+            {role == "student" && (
+              <Link
+                className={`${navLinkClass}${isActive("/courses") ? " bg-[#412D15] text-[#E1DCC9] dark:bg-[#E1DCC9] dark:text-[#1F150C]" : ""}`}
+                to="/courses"
+              >
+                Courses
+              </Link>
+            )}
+            {role == "student" ? (
+              <Link
+                className={`${navLinkClass}${isActive("/purchased") ? " bg-[#412D15] text-[#E1DCC9] dark:bg-[#E1DCC9] dark:text-[#1F150C]" : ""}`}
+                to="/purchased"
+              >
+                My Courses
+              </Link>
+            ) : (
+              <Link
+                className={`${navLinkClass}${isActive("/mycourses") ? " bg-[#412D15] text-[#E1DCC9] dark:bg-[#E1DCC9] dark:text-[#1F150C]" : ""}`}
+                to="/mycourses"
+              >
+                My Courses
+              </Link>
+            )}
+          </nav>
+
+          <div className="flex items-center gap-2 md:gap-3">
+            <button
+              onClick={toggleTheme}
+              className="rounded-full bg-[#412D15] px-3 py-2 text-base text-[#E1DCC9] transition hover:bg-[#2D1F12] dark:bg-[#E1DCC9] dark:text-[#1F150C] dark:hover:bg-[#F8F3EC]"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <FiSun /> : <FiMoon />}
+            </button>
+
             <button
               onClick={() => setMenu(!menu)}
-              className="ml-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-sm font-medium text-cyan-600 transition hover:bg-cyan-500/20 dark:text-cyan-300 md:hidden"
+              className="inline-flex items-center justify-center rounded-full border border-[#412D15]/20 bg-[#412D15]/10 p-2 text-[#412D15] transition hover:bg-[#412D15]/15 dark:border-[#E1DCC9]/10 dark:bg-[#E1DCC9]/10 dark:text-[#E1DCC9] md:hidden"
+              aria-label="Toggle menu"
             >
-              <svg fill="currentColor" viewBox="0 0 20 20" className="w-6 h-6">
+              <svg fill="currentColor" viewBox="0 0 20 20" className="h-5 w-5">
                 {menu ? (
-                  <path d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM9 15a1 1 0 011-1h6a1 1 0 110 2h-6a1 1 0 01-1-1z"></path>
-                ) : (
                   <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"></path>
+                ) : (
+                  <path d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1z"></path>
                 )}
               </svg>
             </button>
-          </div>
 
-          <nav
-            className={`${menu ? "not-md:hidden md:flex" : "flex"} md:flex-row flex-col gap-2 md:justify-end not-md:justify-center w-full md:visible not-md:mb-3  `}
-            onClick={() => setMenu(true)}
-          >
-            <Link
-              className={`${navLinkClass}${location.pathname == `/` && `text-cyan-500 bg-cyan-500/10`}`}
-              to="/"
+            <button
+              type="button"
+              onClick={() => setSideBar(!sideBar)}
+              className="inline-flex items-center justify-center rounded-full border border-[#412D15]/15 bg-[#F8F3EC] p-0.5 transition hover:scale-105 dark:border-[#E1DCC9]/10 dark:bg-[#20170E]"
+              aria-label="Open sidebar"
             >
-              Home
-            </Link>
+              <img
+                alt="user"
+                src={avatar}
+                className="relative inline-block h-9 w-9 rounded-full border-2 border-[#F8F3EC] object-cover object-center shadow-sm cursor-pointer dark:border-[#20170E]"
+              />
+            </button>
+          </div>
+        </div>
 
+        <nav
+          className={`${menu ? "flex" : "hidden"} flex-col gap-2 border-t border-[#412D15]/15 bg-[#F8F3EC]/90 px-4 pb-4 pt-3 md:hidden ${theme === "dark" ? "border-[#E1DCC9]/10 bg-[#1F150C]/90" : ""}`}
+        >
+          <Link
+            className={`${navLinkClass}${isActive("/") ? " bg-[#412D15] text-[#E1DCC9] dark:bg-[#E1DCC9] dark:text-[#1F150C]" : ""}`}
+            to="/"
+            onClick={() => setMenu(false)}
+          >
+            Home
+          </Link>
+
+          {role == "student" && (
             <Link
-              className={`${navLinkClass}${location.pathname == `/courses` && `text-cyan-500 bg-cyan-500/10`}`}
+              className={`${navLinkClass}${isActive("/courses") ? " bg-[#412D15] text-[#E1DCC9] dark:bg-[#E1DCC9] dark:text-[#1F150C]" : ""}`}
               to="/courses"
+              onClick={() => setMenu(false)}
             >
               Courses
             </Link>
-
-            <button
-              onClick={toggleTheme}
-              className={`rounded-full px-3 py-2 text-s font-medium transition hover:bg-cyan-900/80 hover:text-cyan-500 cursor-pointer bg-cyan-700/50`}
-            >
-              {theme === "dark" ? "☀️" : "🌙"}
-            </button>
-          </nav>
-        </div>
-      </header>
-      <div
-        onClick={() => setSideBar(false)}
-        className={`fixed ${sideBar ? "flex" : "hidden"}   flex-col bg-clip-border  backdrop-blur ${theme === "dark" ? "border-slate-800 bg-slate-900/80 text-slate-100" : "border-slate-200 bg-white/80 text-slate-700"} z-100 h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 `}
-      >
-        <div className="mb-2 p-4"></div>
-        <nav className="flex flex-col gap-1 min-w-60 p-2 font-sans text-base font-normal dark:text-white text-gray-700">
-          <Link
-            to="/edit"
-            className="flex justify-start items-center px-3 py-2 gap-3"
-          >
-            <img
-              alt="user 5"
-              src={avatar}
-              className="relative inline-block h-12 w-12 rounded-full border-2 border-white object-cover object-center hover:z-10 focus:z-10"
-            />
-            <p className="text-md font-medium text-black dark:text-white">
-              {userName}
-            </p>
-          </Link>
-          <Link className={navLinkClass} to={`/purchased/${userId}`}>
-            Purchased
-          </Link>
-          {role === "teacher" && (
-            <>
-              <Link className={navLinkClass} to="/mycourses">
-                My Courses
-              </Link>
-              <Link className={navLinkClass} to="/add">
-                Add Course
-              </Link>
-            </>
           )}
-          {isAuthenticated === true ? (
-            <button
-              onClick={logOut}
-              className={`${navLinkClass} cursor-pointer md:flex justify-start`}
+          {role == "student" ? (
+            <Link
+              className={`${navLinkClass}${isActive("/purchased") ? " bg-[#412D15] text-[#E1DCC9] dark:bg-[#E1DCC9] dark:text-[#1F150C]" : ""}`}
+              to="/purchased"
+              onClick={() => setMenu(false)}
             >
-              Logout
-            </button>
+              My Courses
+            </Link>
           ) : (
-            <>
-              <Link className={navLinkClass} to="/login">
-                Login
-              </Link>
-              <Link className={navLinkClass} to="/register">
-                Register
-              </Link>
-            </>
+            <Link
+              className={`${navLinkClass}${isActive("/mycourses") ? " bg-[#412D15] text-[#E1DCC9] dark:bg-[#E1DCC9] dark:text-[#1F150C]" : ""}`}
+              to="/mycourses"
+              onClick={() => setMenu(false)}
+            >
+              My Courses
+            </Link>
           )}
         </nav>
-      </div>
+      </header>
+
+      {sideBar && (
+        <div onClick={() => setSideBar(false)} className="fixed inset-0 z-50">
+          <div
+            className={`fixed right-0 top-0 flex h-screen w-full max-w-[20rem] flex-col border p-4 shadow-2xl backdrop-blur ${theme === "dark" ? "border-[#E1DCC9]/10 bg-[#1F150C] text-[#E1DCC9]" : "border-[#412D15]/15 bg-[#F8F3EC] text-[#1F150C]"}`}
+          >
+            <div className="mb-2 p-4"></div>
+            <nav className="flex min-w-60 flex-col gap-1 p-2 text-base font-normal text-inherit">
+              <Link
+                to="/edit"
+                className="flex items-center justify-start gap-3 rounded-full px-3 py-2 transition-colors hover:bg-[#412D15]/10 hover:text-[#412D15] dark:hover:bg-[#E1DCC9]/10 dark:hover:text-[#E1DCC9]"
+              >
+                <img
+                  alt="user"
+                  src={avatar}
+                  className="relative inline-block h-12 w-12 rounded-full border-2 border-[#F8F3EC] object-cover object-center hover:z-10 focus:z-10 dark:border-[#20170E]"
+                />
+                <p className="text-md font-medium text-[#1F150C] dark:text-[#E1DCC9]">
+                  {userName}
+                </p>
+              </Link>
+
+              {role == "student" && (
+                <Link
+                  className={`${navLinkClass} hover:bg-[#412D15]/10`}
+                  to="/purchased"
+                >
+                  Purchased
+                </Link>
+              )}
+
+              {role === "teacher" && (
+                <>
+                  <Link
+                    className={`${navLinkClass} hover:bg-[#412D15]/10`}
+                    to="/mycourses"
+                  >
+                    My Courses
+                  </Link>
+                  <Link
+                    className={`${navLinkClass} hover:bg-[#412D15]/10`}
+                    to="/add"
+                  >
+                    Add Course
+                  </Link>
+                </>
+              )}
+
+              {isAuthenticated === true ? (
+                <button
+                  onClick={logOut}
+                  className={`${navLinkClass} w-full cursor-pointer justify-start text-left md:flex`}
+                >
+                  Logout
+                </button>
+              ) : (
+                <>
+                  <Link
+                    className={`${navLinkClass} hover:bg-[#412D15]/10`}
+                    to="/login"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    className={`${navLinkClass} hover:bg-[#412D15]/10`}
+                    to="/register"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+            </nav>
+          </div>
+        </div>
+      )}
     </>
   );
 }

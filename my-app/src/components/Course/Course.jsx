@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
-import axios from "axios";
 import Loading from "../Elements/Loading";
 import { useSelector } from "react-redux";
 import YouTube from "react-youtube";
 import { FiLock, FiTrash } from "react-icons/fi";
+import api from "../api";
 export default function Course() {
   const { id } = useParams();
   const playerRef = useRef(null);
@@ -54,9 +54,7 @@ export default function Course() {
   //fetch
   const fetchCourseDetails = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/course/course/${id}`,
-      );
+      const response = await api.get(`/course/course/${id}`);
       setCourse(response.data.course);
       setLevels(response.data.levels || []);
     } catch (error) {
@@ -65,7 +63,7 @@ export default function Course() {
   };
   const fetchComments = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/comment/${id}`);
+      const response = await api.get(`/comment/${id}`);
       setComments(response.data.comments || response.data || []);
     } catch (error) {
       console.error("Error fetching Comments:", error);
@@ -73,9 +71,7 @@ export default function Course() {
   };
   const fetchLastlevel = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/progress/lastlevel/${id}/${userId}`,
-      );
+      const response = await api.get(`/progress/lastlevel/${id}/${userId}`);
       console.log(response.data);
       setLastCompletedLevel(response.data.lastLevel);
       setNextCourseNumber(Number(response.data.numberOfLastLevel) + 1);
@@ -100,15 +96,13 @@ export default function Course() {
     loadAllData();
   }, [id]);
   //comment
-  const handleCancel = () => {
-    setCommentText("");
-  };
+
   const addComment = async (e) => {
     e?.preventDefault();
     if (!commentText.trim()) return;
 
     try {
-      await axios.post("http://localhost:3000/comment", {
+      await api.post("/comment", {
         courseId: id,
         userId,
         text: commentText,
@@ -119,9 +113,12 @@ export default function Course() {
       console.error("Error adding comment:", error);
     }
   };
+  const handleCancel = () => {
+    setCommentText("");
+  };
   const handleDelete = async (commentId) => {
     try {
-      await axios.delete(`http://localhost:3000/comment/${commentId}`);
+      await api.delete(`/comment/${commentId}`);
       setComments(comments.filter((c) => c._id !== commentId));
     } catch (error) {
       console.error("Error deleting comment:", error);
@@ -134,7 +131,7 @@ export default function Course() {
   const handleSaveEdit = async (commentId) => {
     if (!editText.trim()) return;
     try {
-      await axios.patch(`http://localhost:3000/comment/`, {
+      await api.patch(`/comment/`, {
         commentId,
         text: editText,
       });
@@ -156,8 +153,8 @@ export default function Course() {
   // getScore
   const fetchScore = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/quiz/score/${userId}/${selected?.quizId}`,
+      const response = await api.get(
+        `/quiz/score/${userId}/${selected?.quizId}`,
       );
       console.log(response.data);
       setScore(response.data.score);
@@ -213,14 +210,11 @@ export default function Course() {
     hasCompletedRef.current = true;
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/progress/complete",
-        {
-          courseId: id,
-          levelId: selected._id,
-          userId,
-        },
-      );
+      const response = await api.post("/progress/complete", {
+        courseId: id,
+        levelId: selected._id,
+        userId,
+      });
 
       console.log(response.data);
 
@@ -286,7 +280,7 @@ export default function Course() {
       hasCompletedRef.current = true;
 
       try {
-        await axios.post("http://localhost:3000/progress/complete", {
+        await api.post("/progress/complete", {
           courseId: id,
           levelId: selected._id,
           userId,
@@ -309,8 +303,8 @@ export default function Course() {
 
   if (!course) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 text-slate-700 transition-colors dark:bg-slate-950 dark:text-slate-100">
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-4 text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+      <div className="flex min-h-screen items-center justify-center bg-[#E1DCC9] px-4 text-[#1F150C] dark:bg-[#1F150C] dark:text-[#E1DCC9]">
+        <div className="rounded-2xl border border-[#A85E4D]/30 bg-[#F8F3EC] px-6 py-4 text-[#8F4A42] shadow-[0_10px_25px_rgba(31,21,12,0.08)] dark:border-[#E1DCC9]/15 dark:bg-[#20170E] dark:text-[#E1DCC9]">
           Course not found.
         </div>
       </div>
@@ -319,19 +313,17 @@ export default function Course() {
 
   return (
     <div
-      className="min-h-screen bg-slate-50 text-slate-800 transition-colors dark:bg-slate-950 dark:text-slate-100"
+      className="min-h-screen bg-[#E1DCC9] text-[#1F150C] transition-colors dark:bg-[#1F150C] dark:text-[#E1DCC9]"
       dir="rtl"
     >
       <div className="w-full p-5">
         <div className="mt-1 gap-6 md:flex items-start">
-          {/* Main Video & Comments Section */}
           <div className="md:w-3/4 flex flex-col gap-4">
             {selected?.type == "video" ? (
-              <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 h-fit ">
-                {" "}
+              <div className="h-fit overflow-hidden rounded-[28px] border border-[#412D15]/15 bg-[#F8F3EC] shadow-[0_18px_35px_rgba(31,21,12,0.08)] dark:border-[#E1DCC9]/10 dark:bg-[#20170E]">
                 <div className="p-1">
-                  <div className="rounded-3xl border border-slate-200 bg-slate-950 p-2 shadow-inner dark:border-slate-800">
-                    <div className="overflow-hidden rounded-[20px] bg-black">
+                  <div className="rounded-3xl border border-[#412D15]/15 bg-[#1F150C] p-2 shadow-inner dark:border-[#E1DCC9]/10 dark:bg-[#1F150C]">
+                    <div className="overflow-hidden rounded-[20px] bg-[#1F150C]">
                       <YouTube
                         key={selected?._id}
                         videoId={getYoutubeVideoId(selected?.video)}
@@ -359,19 +351,19 @@ export default function Course() {
                       />
                     </div>
                   </div>
-                  <div className="mt-6 rounded-2xl bg-slate-50 p-5 dark:bg-slate-800/70">
+                  <div className="mt-6 rounded-2xl bg-[#E1DCC9] p-5 dark:bg-[#2A1D10]">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white">
+                      <span className="rounded-full bg-[#412D15] px-3 py-1 text-xs font-semibold text-[#E1DCC9] dark:bg-[#E1DCC9] dark:text-[#1F150C]">
                         {selected?.title}
                       </span>
-                      <span className="text-sm text-slate-500 dark:text-slate-400">
+                      <span className="text-sm text-[#412D15]/75 dark:text-[#E1DCC9]/75">
                         {selected?.duration}
                       </span>
                     </div>
-                    <h2 className="mt-3 text-xl font-semibold text-slate-800 dark:text-white">
+                    <h2 className="mt-3 text-xl font-semibold text-[#1F150C] dark:text-[#E1DCC9]">
                       {selected?.description || "Select a level to start"}
                     </h2>
-                    <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                    <p className="mt-2 text-sm leading-7 text-[#412D15]/80 dark:text-[#E1DCC9]/80">
                       In this level, you will learn practical fundamentals
                       through direct examples and real applications to help you
                       understand the content more deeply.
@@ -381,29 +373,35 @@ export default function Course() {
               </div>
             ) : (
               <>
-                <div className="flex justify-center items-center overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 h-[20vh] md:h-[70vh]">
+                <div className="flex h-[20vh] items-center justify-center overflow-hidden rounded-[28px] border border-[#412D15]/15 bg-[#F8F3EC] shadow-[0_18px_35px_rgba(31,21,12,0.08)] dark:border-[#E1DCC9]/10 dark:bg-[#20170E] md:h-[70vh]">
                   {score == "no score" ? (
                     <Link
                       to={`/quiz/${selected.quizId}`}
-                      className="rounded-4xl p-10 text-xl font-bold text-center cursor-pointer text-black bg-slate-200 dark:text-white dark:bg-slate-900 border border-slate-700"
+                      className="cursor-pointer rounded-[2rem] border border-[#412D15]/15 bg-[#E1DCC9] p-10 text-center text-xl font-bold text-[#1F150C] shadow-[0_10px_20px_rgba(31,21,12,0.06)] dark:border-[#E1DCC9]/10 dark:bg-[#2A1D10] dark:text-[#E1DCC9]"
                     >
                       {selected.title} Quiz
                     </Link>
                   ) : (
                     <>
-                      <div className="flex flex-col justify-center items-center gap-4">
-                        <div className="rounded-4xl p-10 md:text-4xl text-xl font-bold text-center text-black bg-slate-200 dark:text-white dark:bg-slate-900 border border-slate-700">
+                      <div className="flex flex-col items-center justify-center gap-4">
+                        <div className="rounded-[2rem] border border-[#412D15]/15 bg-[#E1DCC9] p-10 text-center text-xl font-bold text-[#1F150C] shadow-[0_10px_20px_rgba(31,21,12,0.06)] dark:border-[#E1DCC9]/10 dark:bg-[#2A1D10] dark:text-[#E1DCC9] md:text-4xl">
                           {score.score}/{score.totalScore}
                         </div>
 
                         {score.score < score.totalScore * (1 / 2) && (
                           <Link
                             to={`/quiz/${selected.quizId}`}
-                            className="rounded-4xl p-10 text-xl font-bold text-center cursor-pointer text-black bg-slate-200 dark:text-white dark:bg-slate-900 border border-slate-700"
+                            className="cursor-pointer rounded-[2rem] border border-[#412D15]/15 bg-[#E1DCC9] p-10 text-center text-xl font-bold text-[#1F150C] shadow-[0_10px_20px_rgba(31,21,12,0.06)] dark:border-[#E1DCC9]/10 dark:bg-[#2A1D10] dark:text-[#E1DCC9]"
                           >
                             Answer {selected.title} Quiz Again
                           </Link>
                         )}
+                        <Link
+                          to={`/myanswers/${selected.quizId}`}
+                          className="cursor-pointer rounded-[2rem] border border-[#412D15]/15 bg-[#E1DCC9] p-10 text-center text-xl font-bold text-[#1F150C] shadow-[0_10px_20px_rgba(31,21,12,0.06)] dark:border-[#E1DCC9]/10 dark:bg-[#2A1D10] dark:text-[#E1DCC9]"
+                        >
+                          Show my Answers
+                        </Link>
                       </div>{" "}
                     </>
                   )}
@@ -411,14 +409,13 @@ export default function Course() {
               </>
             )}
 
-            {/* Comments Box */}
-            <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 p-5 space-y-6">
+            <div className="space-y-6 rounded-[28px] border border-[#412D15]/15 bg-[#F8F3EC] p-5 shadow-[0_18px_35px_rgba(31,21,12,0.08)] dark:border-[#E1DCC9]/10 dark:bg-[#20170E]">
               <form onSubmit={addComment}>
                 <div className="flex items-start gap-3">
                   <img
                     alt="user avatar"
                     src={avatar}
-                    className="relative inline-block h-12 w-12 rounded-full border-2 border-white object-cover object-center"
+                    className="relative inline-block h-12 w-12 rounded-full border-2 border-[#F8F3EC] object-cover object-center dark:border-[#20170E]"
                   />
                   <div className="relative flex-1 px-1">
                     <input
@@ -428,28 +425,28 @@ export default function Course() {
                       type="text"
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
-                      className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 dark:text-white focus:outline-none focus:border-rose-600 bg-transparent"
+                      className="peer h-10 w-full border-b-2 border-[#412D15]/20 bg-transparent text-[#1F150C] placeholder-transparent focus:border-[#412D15] focus:outline-none dark:border-[#E1DCC9]/20 dark:text-[#E1DCC9] dark:focus:border-[#E1DCC9]"
                       placeholder="Add Comment"
                     />
                     <label
                       htmlFor="comment"
-                      className="absolute right-0 -top-3.5 text-gray-600 dark:text-gray-200 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm"
+                      className="absolute right-0 -top-3.5 text-sm text-[#412D15]/75 transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-placeholder-shown:text-[#412D15]/60 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-[#412D15] dark:text-[#E1DCC9]/75 dark:peer-placeholder-shown:text-[#E1DCC9]/60 dark:peer-focus:text-[#E1DCC9]"
                     >
                       Add Comment
                     </label>
 
                     {commentText.trim().length > 0 && (
-                      <div className="flex items-center justify-end gap-2 mt-3">
+                      <div className="mt-3 flex items-center justify-end gap-2">
                         <button
                           type="button"
                           onClick={handleCancel}
-                          className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                          className="rounded-full px-4 py-2 text-sm font-medium text-[#412D15] transition-colors hover:bg-[#E1DCC9] dark:text-[#E1DCC9] dark:hover:bg-[#2A1D10]"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-full transition-colors"
+                          className="rounded-full bg-[#412D15] px-4 py-2 text-sm font-medium text-[#E1DCC9] transition-colors hover:bg-[#2D1F12] dark:bg-[#E1DCC9] dark:text-[#1F150C] dark:hover:bg-[#F8F3EC]"
                         >
                           Comment
                         </button>
@@ -459,7 +456,6 @@ export default function Course() {
                 </div>
               </form>
 
-              {/* Comments List */}
               <div className="space-y-3">
                 {comments.map((comment) => {
                   const isMyComment =
@@ -468,7 +464,7 @@ export default function Course() {
                   return (
                     <div
                       key={comment._id}
-                      className="flex items-start gap-3 p-4 rounded-[20px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
+                      className="flex items-start gap-3 rounded-[20px] border border-[#412D15]/15 bg-[#E1DCC9] p-4 shadow-[0_8px_16px_rgba(31,21,12,0.04)] dark:border-[#E1DCC9]/10 dark:bg-[#2A1D10]"
                     >
                       <img
                         alt={comment.userId?.name || "User"}
@@ -476,7 +472,7 @@ export default function Course() {
                         className="h-10 w-10 rounded-full object-cover"
                       />
                       <div className="flex-1">
-                        <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">
+                        <span className="text-sm font-semibold text-[#1F150C] dark:text-[#E1DCC9]">
                           {comment.userId?.name || "Anonymous"}
                         </span>
 
@@ -486,27 +482,27 @@ export default function Course() {
                               type="text"
                               value={editText}
                               onChange={(e) => setEditText(e.target.value)}
-                              className="w-full border-b-2 border-blue-500 bg-transparent py-1 text-sm text-gray-900 dark:text-white focus:outline-none"
+                              className="w-full border-b-2 border-[#412D15]/40 bg-transparent py-1 text-sm text-[#1F150C] focus:border-[#412D15] focus:outline-none dark:border-[#E1DCC9]/40 dark:text-[#E1DCC9] dark:focus:border-[#E1DCC9]"
                             />
                             <div className="flex justify-end gap-2">
                               <button
                                 type="button"
                                 onClick={handleCancelEdit}
-                                className="px-3 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full"
+                                className="rounded-full px-3 py-1 text-xs text-[#412D15] hover:bg-[#F8F3EC] dark:text-[#E1DCC9] dark:hover:bg-[#20170E]"
                               >
                                 Cancel
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleSaveEdit(comment._id)}
-                                className="px-3 py-1 text-xs text-white bg-blue-600 hover:bg-blue-700 rounded-full"
+                                className="rounded-full bg-[#412D15] px-3 py-1 text-xs text-[#E1DCC9] hover:bg-[#2D1F12] dark:bg-[#E1DCC9] dark:text-[#1F150C] dark:hover:bg-[#F8F3EC]"
                               >
                                 Save
                               </button>
                             </div>
                           </div>
                         ) : (
-                          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                          <p className="mt-1 text-sm text-[#412D15]/80 dark:text-[#E1DCC9]/80">
                             {comment.text}
                           </p>
                         )}
@@ -517,14 +513,14 @@ export default function Course() {
                           <button
                             type="button"
                             onClick={() => handleStartEdit(comment)}
-                            className="text-xs text-blue-600 hover:underline"
+                            className="text-xs text-[#412D15] hover:underline dark:text-[#E1DCC9]"
                           >
                             Edit
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDelete(comment._id)}
-                            className="text-xs text-rose-600 hover:underline"
+                            className="text-xs text-[#A85E4D] hover:underline dark:text-[#E6B0A6]"
                           >
                             Delete
                           </button>
@@ -537,15 +533,14 @@ export default function Course() {
             </div>
           </div>
 
-          {/* Sidebar Section */}
           <div className="md:h-[calc(100%-8rem)] md:flex flex-col justify-between md:w-1/4 gap-5">
-            <div className="rounded-[28px] border border-slate-200 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/80 md:h-[30%] not-md:mt-4">
+            <div className="rounded-[28px] border border-[#412D15]/15 bg-[#F8F3EC]/85 p-6 shadow-[0_18px_35px_rgba(31,21,12,0.08)] backdrop-blur md:h-[30%] not-md:mt-4 dark:border-[#E1DCC9]/10 dark:bg-[#20170E]/90">
               <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
                 <div className="max-w-2xl flex gap-3 flex-row-reverse">
-                  <h1 className="mt-2 text-3xl font-bold tracking-tight">
+                  <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#1F150C] dark:text-[#E1DCC9]">
                     {course.name}
                   </h1>
-                  <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                  <p className="mt-2 text-sm leading-6 text-[#412D15]/80 dark:text-[#E1DCC9]/80">
                     {course.description}
                   </p>
                 </div>
@@ -553,25 +548,25 @@ export default function Course() {
 
               <div className="mt-3">
                 <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400">
+                  <span className="text-[#412D15]/75 dark:text-[#E1DCC9]/75">
                     Progress
                   </span>
-                  <span className="font-medium rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-300">
+                  <span className="rounded-2xl border border-[#412D15]/15 bg-[#E1DCC9] px-4 py-3 text-sm font-medium text-[#1F150C] dark:border-[#E1DCC9]/10 dark:bg-[#2A1D10] dark:text-[#E1DCC9]">
                     {lastCompletedLevel?.level ?? 0}/{levels.length}
                   </span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800">
+                <div className="h-2 w-full rounded-full bg-[#E1DCC9] dark:bg-[#412D15]/50">
                   <div
-                    className="h-2 rounded-full bg-linear-to-r from-indigo-500 to-violet-500 transition-all duration-500"
+                    className="h-2 rounded-full bg-[#412D15] transition-all duration-500 dark:bg-[#E1DCC9]"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
               </div>
             </div>
 
-            <aside className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 md:h-[67%] md:overflow-y-auto not-md:mt-5">
-              <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-                <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+            <aside className="overflow-hidden rounded-[28px] border border-[#412D15]/15 bg-[#F8F3EC] shadow-[0_18px_35px_rgba(31,21,12,0.08)] md:h-[67%] md:overflow-y-auto not-md:mt-5 dark:border-[#E1DCC9]/10 dark:bg-[#20170E]">
+              <div className="border-b border-[#412D15]/15 px-5 py-4 dark:border-[#E1DCC9]/10">
+                <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#412D15]/75 dark:text-[#E1DCC9]/75">
                   Course content
                 </h3>
               </div>
@@ -583,12 +578,12 @@ export default function Course() {
                       key={level._id}
                       disabled={level.level > nextCourseNumber ? true : false}
                       onClick={() => !level.locked && setSelected(level)}
-                      className={`w-full rounded-2xl border p-4 text-right transition-all  duration-200 ${
+                      className={`w-full rounded-2xl border p-4 text-right transition-all duration-200 ${
                         selected?._id === level._id
-                          ? "border-indigo-500 bg-indigo-600 shadow-lg shadow-indigo-900/20"
+                          ? "border-[#412D15] bg-[#412D15] shadow-[0_12px_22px_rgba(31,21,12,0.18)]"
                           : level.level > nextCourseNumber
-                            ? "cursor-not-allowed border-slate-200 bg-slate-100/70 opacity-60 dark:border-slate-700 dark:bg-slate-800/50"
-                            : "cursor-pointer border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/70 dark:hover:border-slate-600 dark:hover:bg-slate-700"
+                            ? "cursor-not-allowed border-[#412D15]/10 bg-[#E1DCC9]/70 opacity-60"
+                            : "cursor-pointer border-[#412D15]/15 bg-[#E1DCC9] hover:border-[#412D15]/30 hover:bg-[#E6DFC8]"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -597,8 +592,8 @@ export default function Course() {
                             <span
                               className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
                                 selected?._id === level._id
-                                  ? "bg-white text-indigo-600"
-                                  : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                                  ? "bg-[#E1DCC9] text-[#412D15]"
+                                  : "bg-[#F8F3EC] text-[#412D15]"
                               }`}
                             >
                               {level.level}
@@ -606,8 +601,8 @@ export default function Course() {
                             <span
                               className={`text-sm font-semibold ${
                                 selected?._id === level._id
-                                  ? "text-white"
-                                  : "text-slate-700 dark:text-slate-200"
+                                  ? "text-[#E1DCC9]"
+                                  : "text-[#1F150C]"
                               }`}
                             >
                               {level.title}
@@ -616,8 +611,8 @@ export default function Course() {
                           <p
                             className={`mt-2 text-xs leading-6 ${
                               selected?._id === level._id
-                                ? "text-indigo-100"
-                                : "text-slate-500 dark:text-slate-400"
+                                ? "text-[#E1DCC9]/80"
+                                : "text-[#412D15]/70"
                             }`}
                           >
                             {level.description}
@@ -626,13 +621,19 @@ export default function Course() {
 
                         <div>
                           {level.level > nextCourseNumber ? (
-                            <FiLock />
+                            <FiLock
+                              className={
+                                selected?._id === level._id
+                                  ? "text-[#E1DCC9]"
+                                  : "text-[#412D15]/60"
+                              }
+                            />
                           ) : (
                             <svg
                               className={`h-4 w-4 ${
                                 selected?._id === level._id
-                                  ? "text-white"
-                                  : "text-slate-400"
+                                  ? "text-[#E1DCC9]"
+                                  : "text-[#412D15]/60"
                               }`}
                               fill="currentColor"
                               viewBox="0 0 20 20"
@@ -649,7 +650,7 @@ export default function Course() {
                     </button>
                   ))
                 ) : (
-                  <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-400">
+                  <div className="rounded-2xl border border-dashed border-[#412D15]/20 bg-[#E1DCC9] p-4 text-sm text-[#412D15]/70">
                     No levels available for this course yet.
                   </div>
                 )}
