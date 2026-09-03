@@ -80,7 +80,6 @@ export default function Course() {
       console.error("Error fetching Last Level:", error);
     }
   };
-
   //loadAllData
   useEffect(() => {
     const loadAllData = async () => {
@@ -96,7 +95,6 @@ export default function Course() {
     loadAllData();
   }, [id]);
   //comment
-
   const addComment = async (e) => {
     e?.preventDefault();
     if (!commentText.trim()) return;
@@ -185,7 +183,7 @@ export default function Course() {
     }
   };
   //progress
-  const progress =
+  let progress =
     levels.length > 0 && lastCompletedLevel?.level
       ? (lastCompletedLevel.level / levels.length) * 100
       : 0;
@@ -215,7 +213,10 @@ export default function Course() {
         levelId: selected._id,
         userId,
       });
-
+      const response2 = await api.get(`/progress/lastlevel/${id}/${userId}`);
+      console.log(response2.data);
+      setLastCompletedLevel(response2.data.lastLevel);
+      setNextCourseNumber(Number(response2.data.numberOfLastLevel) + 1);
       console.log(response.data);
 
       if (response.data.message !== "Level already completed") {
@@ -322,7 +323,7 @@ export default function Course() {
             {selected?.type == "video" ? (
               <div className="h-fit overflow-hidden rounded-[28px] border border-[#412D15]/15 bg-[#F8F3EC] shadow-[0_18px_35px_rgba(31,21,12,0.08)] dark:border-[#E1DCC9]/10 dark:bg-[#20170E]">
                 <div className="p-1">
-                  <div className="rounded-3xl border border-[#412D15]/15 bg-[#1F150C] p-2 shadow-inner dark:border-[#E1DCC9]/10 dark:bg-[#1F150C]">
+                  <div className="rounded-3xl border border-[#412D15]/15 bg-[#1F150C] p- shadow-inner dark:border-[#E1DCC9]/10 dark:bg-[#1F150C]">
                     <div className="overflow-hidden rounded-[20px] bg-[#1F150C]">
                       <YouTube
                         key={selected?._id}
@@ -351,7 +352,7 @@ export default function Course() {
                       />
                     </div>
                   </div>
-                  <div className="mt-6 rounded-2xl bg-[#E1DCC9] p-5 dark:bg-[#2A1D10]">
+                  <div className="mt-6 rounded-3xl bg-[#E1DCC9] p-5 dark:bg-[#2A1D10]">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded-full bg-[#412D15] px-3 py-1 text-xs font-semibold text-[#E1DCC9] dark:bg-[#E1DCC9] dark:text-[#1F150C]">
                         {selected?.title}

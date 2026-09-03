@@ -36,12 +36,12 @@ export default function Login() {
       setErrorMessage(error.response.data.error);
     }
   };
-  
+
   return (
     <div>
-      <div className="flex min-h-screen  px-4 py-10 bg-slate-50 dark:bg-slate-950 sm:px-6 lg:px-8">
+      <div className="flex min-h-screen justify-center px-4 py-10 bg-slate-50 dark:bg-slate-950 sm:px-6 lg:px-8">
         {/* Left Pane */}
-        <div className="hidden lg:flex items-center justify-center flex-1  text-slate-700  dark:text-slate-100">
+        {/* <div className="hidden lg:flex items-center justify-center flex-1  text-slate-700  dark:text-slate-100">
           <div className="max-w-md text-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -296,14 +296,14 @@ export default function Login() {
               </g>
             </svg>
           </div>
-        </div>
+        </div> */}
         {/* Right Pane */}
         <div className="w-full  lg:w-1/2 flex items-center justify-center">
           <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-xl dark:border-slate-800 dark:bg-slate-900">
             <h1 className="mb-6 text-center text-3xl font-semibold text-slate-800 dark:text-slate-100">
               Login
             </h1>
-            <h1 className="text-sm font-semibold mb-6 text-gray-500 text-center">
+            <h1 className="mb-6 text-center text-sm font-semibold text-slate-500 dark:text-slate-300">
               Join to Our Community with all time access and free{" "}
             </h1>
             {errorMessage && (
@@ -316,7 +316,7 @@ export default function Login() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
                   Email
                 </label>
@@ -325,13 +325,13 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   id="email"
                   name="email"
-                  className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 outline-none transition-colors duration-300 placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
                 />
               </div>
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
                   Password
                 </label>
@@ -340,7 +340,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   id="password"
                   name="password"
-                  className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 outline-none transition-colors duration-300 placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
                 />
               </div>
               <div>
@@ -352,10 +352,13 @@ export default function Login() {
                 </button>
               </div>
             </form>
-            <div className="mt-4 text-sm text-gray-600 text-center">
+            <div className="mt-4 text-center text-sm text-slate-600 dark:text-slate-300">
               <p>
                 Dont have an account?{" "}
-                <Link to="/register" className="text-black hover:underline">
+                <Link
+                  to="/register"
+                  className="font-medium text-cyan-700 hover:underline dark:text-cyan-300"
+                >
                   Signup Here
                 </Link>
               </p>

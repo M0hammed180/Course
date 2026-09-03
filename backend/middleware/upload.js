@@ -7,8 +7,17 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "courses",
-    resource_type: "auto", 
-    allowed_formats: ["jpg", "jpeg", "png", "webp", "mp4", "mov", "avi"], 
+    resource_type: "auto",
+    allowed_formats: [
+      "jpg",
+      "jpeg",
+      "png",
+      "webp",
+      "mp4",
+      "mov",
+      "avi",
+      "avif",
+    ],
   },
 });
 

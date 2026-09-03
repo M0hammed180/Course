@@ -60,11 +60,11 @@ export default function MyAnswers() {
     <>
       {isPassed ? (
         <div className="relative min-h-[90vh] w-full overflow-y-auto bg-[#E1DCC9] p-4 text-[#1F150C] dark:bg-[#1F150C] dark:text-[#E1DCC9] sm:p-6">
-          <div className="fixed left-0 right-0 top-4 z-10 flex items-center justify-between px-4 sm:px-10">
-            <div className="rounded-full border border-[#412D15]/15 bg-[#F8F3EC]/85 px-4 py-1.5 text-sm font-bold text-[#1F150C] shadow-[0_8px_16px_rgba(31,21,12,0.04)] backdrop-blur dark:border-[#E1DCC9]/10 dark:bg-[#20170E]/80 dark:text-[#E1DCC9]">
+          <div className="fixed left-0 right-0 top-20 z-10 flex items-center justify-between px-4 sm:px-10">
+            <div className="rounded-full border border-[#412D15]/15 bg-[#F8F3EC]/60 px-4 py-1.5 text-sm font-bold text-[#1F150C] shadow-[0_8px_16px_rgba(31,21,12,0.04)] backdrop-blur dark:border-[#E1DCC9]/10 dark:bg-[#20170E]/80 dark:text-[#E1DCC9]">
               {score.score}/{score.totalScore}
             </div>
-            <div className="mr-10 rounded-full border border-[#412D15]/15 bg-[#F8F3EC]/85 px-4 py-1.5 text-sm font-bold text-[#1F150C] shadow-[0_8px_16px_rgba(31,21,12,0.04)] backdrop-blur dark:border-[#E1DCC9]/10 dark:bg-[#20170E]/80 dark:text-[#E1DCC9]">
+            <div className="mr-10 rounded-full border border-[#412D15]/15 bg-[#F8F3EC]/60 px-4 py-1.5 text-sm font-bold text-[#1F150C] shadow-[0_8px_16px_rgba(31,21,12,0.04)] backdrop-blur dark:border-[#E1DCC9]/10 dark:bg-[#20170E]/80 dark:text-[#E1DCC9]">
               <span>
                 {Math.floor(Number(timeSpent) / 60)}:
                 {String(Number(timeSpent) % 60).padStart(2, "0")}

@@ -52,7 +52,7 @@ export default function Courses() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 md:px-6 md:py-24 px-3 py-10  dark:bg-slate-950 ">
+    <div className="min-h-screen  md:px-6 md:py-24 px-3 py-10   ">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 sm:px-8 lg:px-10">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-500">

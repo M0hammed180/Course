@@ -10,18 +10,17 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
   const [avatar, setAvatar] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [preview, setPreview] = useState("/default-avatar.svg");
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
 
-    if (e.target.files && e.target.files.length > 0) {
-      setAvatar(file);
-    } else {
-      setAvatar(null);
-    }
+    setAvatar(file || null);
 
-    if (!file) return;
+    if (!file) {
+      setPreview("/default-avatar.svg");
+      return;
+    }
 
     const imageUrl = URL.createObjectURL(file);
     setPreview(imageUrl);
@@ -79,6 +78,10 @@ export default function Register() {
                     src={preview}
                     alt="Avatar Preview"
                     className="h-full w-full object-cover"
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = "/default-avatar.svg";
+                    }}
                   />
                 </label>{" "}
                 <input
@@ -96,7 +99,7 @@ export default function Register() {
                   <div>
                     <label
                       htmlFor="username"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-200"
                     >
                       Username
                     </label>
@@ -105,13 +108,13 @@ export default function Register() {
                       onChange={(e) => setName(e.target.value)}
                       id="username"
                       name="username"
-                      className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 outline-none transition-colors duration-300 placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="phone"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-200"
                     >
                       Phone
                     </label>
@@ -120,7 +123,7 @@ export default function Register() {
                       onChange={(e) => setPhone(e.target.value)}
                       id="phone"
                       name="phone"
-                      className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 outline-none transition-colors duration-300 placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
                     />
                   </div>
                 </div>
@@ -128,7 +131,7 @@ export default function Register() {
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-200"
                     >
                       Email
                     </label>
@@ -137,13 +140,13 @@ export default function Register() {
                       onChange={(e) => setEmail(e.target.value)}
                       id="email"
                       name="email"
-                      className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 outline-none transition-colors duration-300 placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="password"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-200"
                     >
                       Password
                     </label>
@@ -152,7 +155,7 @@ export default function Register() {
                       onChange={(e) => setPassword(e.target.value)}
                       id="password"
                       name="password"
-                      className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 outline-none transition-colors duration-300 placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
                     />
                   </div>
                 </div>
@@ -163,7 +166,7 @@ export default function Register() {
                   id="role"
                   onChange={(e) => setRole(e.target.value)}
                   name="role"
-                  className="mt-1 p-2 w-5/12 border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+                  className="mt-1 w-5/12 rounded-md border border-slate-300 bg-white p-2 text-slate-900 outline-none transition-colors duration-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="student" className="dark:bg-slate-800">
                     Student
@@ -181,10 +184,13 @@ export default function Register() {
                 </button>
               </div>
             </form>
-            <div className="mt-4 text-sm text-gray-600 dark:text-gray-100 text-center">
+            <div className="mt-4 text-center text-sm text-slate-600 dark:text-slate-300">
               <p>
                 Already have an account?{" "}
-                <Link to="/login" className="hover:underline">
+                <Link
+                  to="/login"
+                  className="font-medium text-cyan-700 hover:underline dark:text-cyan-300"
+                >
                   Login here
                 </Link>
               </p>

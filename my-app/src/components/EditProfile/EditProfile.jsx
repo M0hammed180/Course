@@ -65,7 +65,7 @@ export default function EditProfile() {
       console.log("Success:", response.data.message);
     } catch (error) {
       if (error.response) {
-        console.error("Edited Failed:", error.response.data.error);
+        console.error("Edited Failed:", error.response);
       } else {
         console.error("Network Error:", error.message);
       }

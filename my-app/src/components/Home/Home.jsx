@@ -241,7 +241,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#412D15]">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] dark:text-[#c6c2b0] text-[#412D15]">
                 Popular Picks
               </p>
               <h2 className="text-3xl font-bold text-[#1F150C] dark:text-[#E1DCC9]">
@@ -286,19 +286,22 @@ export default function Home() {
 
       <section className="px-6 py-16 sm:px-8 lg:px-10">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2 lg:items-center">
-          <img
-            src={heroPhoto}
-            alt="online learning"
-            className="h-105 w-full rounded-3xl object-cover shadow-xl"
-          />
+          <div className="relative h-105 overflow-hidden rounded-3xl shadow-xl">
+            <img
+              src={heroPhoto}
+              alt="online learning"
+              className="h-full w-full object-cover"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(31,21,12,0.82),rgba(65,45,21,0.72))]" />
+          </div>
           <div>
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#412D15]">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] dark:text-[#c6c2b0] text-[#412D15]">
               About Us
             </p>
             <h2 className="mb-4 text-3xl font-bold text-[#1F150C] dark:text-[#E1DCC9]">
               A modern platform for practical learning
             </h2>
-            <p className="text-lg leading-8 text-[#412D15]/75 dark:text-[#E1DCC9]/80">
+            <p className="text-lg leading-8  text-[#412D15]/75 dark:text-[#E1DCC9]/80">
               Our platform provides high-quality courses in programming, design,
               and many other fields to help you grow your skills in a focused
               and inspiring environment.
@@ -316,7 +319,7 @@ export default function Home() {
             {comments.map((c) => (
               <div
                 key={c._id}
-                className="rounded-3xl bg-gradient-to-br from-[#412D15] to-[#1F150C] p-8 text-[#E1DCC9] shadow-xl"
+                className="rounded-3xl bg-[#1F150C] p-8 text-[#E1DCC9] shadow-xl"
               >
                 <p className="mb-6 text-lg leading-8">{c.text}</p>
                 <div className="flex items-center gap-4">
@@ -342,7 +345,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl gap-8 rounded-3xl border border-[#412D15]/15 bg-[#F8F3EC] p-8 shadow-xl dark:border-[#E1DCC9]/10 dark:bg-[#1F150C] lg:grid-cols-2 lg:p-10">
           <div className="flex items-center justify-center">
             <div className="w-full max-w-md">
-              <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#412D15] dark:text-[#E1DCC9]">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] dark:text-[#c6c2b0] text-[#412D15] ">
                 Contact Us
               </p>
               <h2 className="mb-6 text-3xl font-bold text-[#1F150C] dark:text-[#E1DCC9]">
@@ -353,13 +356,13 @@ export default function Home() {
                   type="text"
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Your Name"
-                  className="w-full rounded-2xl border border-[#412D15]/15 bg-[#FFFDF9] p-3 text-[#1F150C] outline-none transition placeholder:text-[#412D15]/60 focus:border-[#412D15] focus:ring-2 focus:ring-[#412D15]/10 dark:border-[#E1DCC9]/10 dark:bg-[#1F150C] dark:text-[#E1DCC9] dark:placeholder:text-[#E1DCC9]/60 dark:focus:border-[#E1DCC9]"
+                  className="w-full rounded-2xl border border-[#412D15]/15 bg-[#FFFDF9] p-3 outline-none transition  text-[#412D15]/60 focus:border-[#412D15] focus:ring-2 focus:ring-[#412D15]/10 dark:border-[#E1DCC9]/10 dark:bg-[#1F150C] dark:text-[#E1DCC9] dark:placeholder:text-[#E1DCC9]/60 dark:focus:border-[#E1DCC9]"
                 />
                 <input
                   type="email"
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your Email"
-                  className="w-full rounded-2xl border border-[#412D15]/15 bg-[#FFFDF9] p-3 text-[#1F150C] outline-none transition placeholder:text-[#412D15]/60 focus:border-[#412D15] focus:ring-2 focus:ring-[#412D15]/10 dark:border-[#E1DCC9]/10 dark:bg-[#1F150C] dark:text-[#E1DCC9] dark:placeholder:text-[#E1DCC9]/60 dark:focus:border-[#E1DCC9]"
+                  className="w-full rounded-2xl border border-[#412D15]/15 bg-[#FFFDF9] p-3 outline-none transition  text-[#412D15]/60 focus:border-[#412D15] focus:ring-2 focus:ring-[#412D15]/10 dark:border-[#E1DCC9]/10 dark:bg-[#1F150C] dark:text-[#E1DCC9] dark:placeholder:text-[#E1DCC9]/60 dark:focus:border-[#E1DCC9]"
                 />
                 <select
                   onChange={(e) => setSubject(e.target.value)}
@@ -373,7 +376,7 @@ export default function Home() {
                   placeholder="Your Message"
                   onChange={(e) => setMessage(e.target.value)}
                   rows="4"
-                  className="w-full rounded-2xl border border-[#412D15]/15 bg-[#FFFDF9] p-3 text-[#1F150C] outline-none transition placeholder:text-[#412D15]/60 focus:border-[#412D15] focus:ring-2 focus:ring-[#412D15]/10 dark:border-[#E1DCC9]/10 dark:bg-[#1F150C] dark:text-[#E1DCC9] dark:placeholder:text-[#E1DCC9]/60 dark:focus:border-[#E1DCC9]"
+                  className="w-full rounded-2xl border border-[#412D15]/15 bg-[#FFFDF9] p-3 outline-none transition  text-[#412D15]/60 focus:border-[#412D15] focus:ring-2 focus:ring-[#412D15]/10 dark:border-[#E1DCC9]/10 dark:bg-[#1F150C] dark:text-[#E1DCC9] dark:placeholder:text-[#E1DCC9]/60 dark:focus:border-[#E1DCC9]"
                 ></textarea>
                 <button
                   type="submit"
@@ -384,11 +387,19 @@ export default function Home() {
               </form>
             </div>
           </div>
-          <img
+          {/* <img
             src="https://images.unsplash.com/photo-1553877522-43269d4ea984"
             alt="contact"
             className="h-105 w-full rounded-3xl object-cover"
-          />
+          /> */}
+          <div className="relative h-105 overflow-hidden rounded-3xl shadow-xl">
+            <img
+              src="https://images.unsplash.com/photo-1553877522-43269d4ea984"
+              alt="contact"
+              className="h-105 w-full rounded-3xl object-cover"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(31,21,12,0.82),rgba(65,45,21,0.72))]" />
+          </div>
         </div>
       </section>
     </div>
